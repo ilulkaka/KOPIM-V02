@@ -26,7 +26,6 @@ class TransaksiController extends Controller
 
     public function getBarcode(Request $request)
     {
-        // dd($request->all());
         if (! in_array($request->user()->role, ['Administrator', 'Kasir'])) {
             return [
                 'success' => false,
@@ -149,5 +148,60 @@ class TransaksiController extends Controller
             'hasil_umum' => $hasil_umum[0]->nominal,
             'hasil_total' => $hasil_total,
         ];
+    }
+
+    public function listDetailTrx (Request $request){
+        $draw = $request->input('draw');
+        $search = $request->input('search')['value'];
+        $start = (int) $request->input('start');
+        $length = (int) $request->input('length');
+        $tgl_awal = $request->tgl_awal;
+        $tgl_akhir = $request->tgl_akhir;
+        $Datas = DB::table('tb_trx_belanja')
+            ->whereBetween('tgl_trx', [$tgl_awal, $tgl_akhir])
+            ->where(function ($q) use ($search) {
+                $q
+                    ->where('no_barcode', 'like', '%' . $search . '%')
+                    ->orwhere('nama', 'like', '%' . $search . '%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->skip($start)
+            ->take($length)
+            ->get();
+
+        $count = DB::table('tb_trx_belanja')
+            ->whereBetween('tgl_trx', [$tgl_awal, $tgl_akhir])
+            ->where(function ($q) use ($search) {
+                $q
+                    ->where('no_barcode', 'like', '%' . $search . '%')
+                    ->orwhere('nama', 'like', '%' . $search . '%');
+            })
+            ->count();
+
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $count,
+            'recordsFiltered' => $count,
+            'data' => $Datas,
+        ];
+    }
+
+    public function edtTransaksi (Request $request){
+        if (in_array($request->user()->role, ['Administrator'])) {
+        $findid = TransaksiModel::find($request->et_id);
+            $findid->nominal = $request->et_nominal;
+
+            $findid->save();
+
+            return [
+                'message' => 'Edit data Berhasil .',
+                'success' => true,
+            ];
+        } else {
+            return [
+                'message' => 'Edit gagal, Access Denied .',
+                'success' => false,
+            ];
+        }
     }
 }

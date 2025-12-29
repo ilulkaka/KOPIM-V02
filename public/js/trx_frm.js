@@ -47,6 +47,15 @@ $(document).ready(function () {
         getLoad();
     });
 
+    $("#btn_detail_trx").click(function () {
+        $("#modal_detail_trx").modal("show");
+        getListDetailTrx();
+    });
+
+    $("#btn_reload").on("click", function () {
+        list_detail_trx.ajax.reload();
+    });
+
     $("#frm_trx").on("submit", function (e) {
         e.preventDefault();
         var datas = $(this).serialize();
@@ -77,7 +86,159 @@ $(document).ready(function () {
                 );
             });
     });
+
+    $("#tb_detail_trx").on("click", ".edtTrx", function (e) {
+        e.preventDefault();
+        var datas = list_detail_trx.row($(this).parents("tr")).data();
+        $("#et_id").val(datas.id_trx_belanja);
+        $("#et_tgl").val(datas.tgl_trx);
+        $("#et_no").val(datas.no_barcode);
+        $("#et_nama").val(datas.nama);
+        $("#et_nominal").val(datas.nominal);
+
+        $("#modal_edit_trx").modal("show");
+    });
+
+    $("#frm_edt_trx").on("submit", function (e) {
+        e.preventDefault();
+        var datas = $(this).serialize();
+
+        $.ajax({
+            url: APP_BACKEND + "api/trx/edt_transaksi",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + key);
+            },
+            type: "patch",
+            dataType: "json",
+            data: datas,
+        })
+            .done(function (resp) {
+                if (resp.success) {
+                    fireAlert("success", resp.message);
+                    $("#modal_edit_trx").modal("toggle");
+                    list_detail_trx.ajax.reload(null, false);
+                } else {
+                    infoFireAlert("error", resp.message);
+                }
+            })
+            .fail(function () {
+                $("#error").html(
+                    "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
+                );
+            });
+    });
 });
+
+var list_detail_trx;
+function getListDetailTrx() {
+    if ($.fn.DataTable.isDataTable("#tb_detail_trx")) {
+        list_detail_trx.ajax.reload();
+    } else {
+        list_detail_trx = $("#tb_detail_trx").DataTable({
+            // destroy: true,
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: false,
+            autoWidth: false,
+            ajax: {
+                url: APP_BACKEND + "api/trx/list_detail_trx",
+                type: "GET",
+                beforeSend: function (xhr) {
+                    $("#btn_reload").attr("disabled", true);
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                data: function (d) {
+                    d.tgl_awal = $("#tgl_awal").val();
+                    d.tgl_akhir = $("#tgl_akhir").val();
+                },
+                dataType: "json",
+                complete: function () {
+                    $("#btn_reload").attr("disabled", false);
+                },
+                error: function () {
+                    $("#btn_reload").attr("disabled", false);
+                },
+            },
+
+            columnDefs: [
+                {
+                    targets: [0],
+                    visible: false,
+                    searchable: false,
+                },
+                {
+                    targets: [5],
+                    data: null,
+                    // width: '10%',
+                    render: function (data, type, row, meta) {
+                        return "<a href = '#' style='font-size:14px' class = 'edtTrx'> Edit </a> || <a href = '#' style='font-size:14px' class ='delTrx' > Deleted </a>";
+                    },
+                },
+            ],
+
+            columns: [
+                {
+                    data: "id_trx_belanja",
+                    name: "id_trx_belanja",
+                },
+                {
+                    data: "tgl_trx",
+                    name: "tgl_trx",
+                },
+                {
+                    data: "no_barcode",
+                    name: "no_barcode",
+                },
+                {
+                    data: "nama",
+                    name: "nama",
+                    width: "40%",
+                },
+                {
+                    data: "nominal",
+                    name: "nominal",
+                    render: $.fn.dataTable.render.number(",", ".", 0, ""),
+                },
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(),
+                    data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === "string"
+                        ? i.replace(/[\$,]/g, "") * 1
+                        : typeof i === "number"
+                        ? i
+                        : 0;
+                };
+
+                // Total over all pages
+                total = api
+                    .column(1)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Total over this page
+                TotalNominal = api
+                    .column(4, {
+                        page: "current",
+                    })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                $(api.column(4).footer()).html(
+                    TotalNominal.toLocaleString("en-US")
+                );
+            },
+        });
+    }
+}
 
 function hasilTrxToday() {
     $.ajax({

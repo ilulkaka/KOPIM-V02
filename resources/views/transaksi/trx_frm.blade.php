@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('plugins.Datatables', true)
 {{-- @extends('adminlte::page') --}}
 
 @section('title', 'Transaksi')
@@ -143,9 +144,6 @@
                 <div class="modal-header bg-info">
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fas fa-cart"> Detail
                                 Transaksi</i></b> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -168,7 +166,9 @@
                     <br>
 
                     <div class="table-responsive">
-                        <table id="tb_detail_trx" class="table table-hover text-nowrap" style="width:100%">
+                        <table id="tb_detail_trx"
+                            class="table table-bordered table-stripped table-hover text-nowrap table-sm dataTable"
+                            style="width:100%">
                             <thead>
                                 <tr>
                                     <th>id</th>
@@ -194,6 +194,9 @@
                             </tfoot>
                         </table>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn_close">Close</button>
                 </div>
             </div>
         </div>
@@ -265,9 +268,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="form_et">
-                        @csrf
+                <form id="frm_edt_trx">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col col-md-6">
                                 <strong><i class="fas fa-file-prescription"> Tgl Transaksi</i></strong>
@@ -294,11 +297,11 @@
                                     style="font-size: 24px; color:red; font-weight:bold">
                             </div>
                         </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary btn-flat" id="btn_save_et">Save</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="btn_save_et">Save</button>
+                    </div>
                 </form>
             </div>
         </div>
