@@ -274,6 +274,7 @@
                         <div class="row">
                             <div class="col col-md-6">
                                 <strong><i class="fas fa-file-prescription"> Tgl Transaksi</i></strong>
+                                <input type="hidden" name="et_id_anggota" id="et_id_anggota">
                                 <input type="hidden" name="et_id" id="et_id">
                                 <input type="hidden" id="role" name="role" value="{{ Auth::user()->role }}">
                                 <input type="text" id="et_tgl" name="et_tgl" class="form-control rounded-0"

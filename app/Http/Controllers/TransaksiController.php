@@ -157,24 +157,26 @@ class TransaksiController extends Controller
         $length = (int) $request->input('length');
         $tgl_awal = $request->tgl_awal;
         $tgl_akhir = $request->tgl_akhir;
-        $Datas = DB::table('tb_trx_belanja')
-            ->whereBetween('tgl_trx', [$tgl_awal, $tgl_akhir])
+        $Datas = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b','a.no_barcode','=','b.no_barcode')
+            ->select('a.*','b.id_anggota')
+            ->whereBetween('a.tgl_trx', [$tgl_awal, $tgl_akhir])
             ->where(function ($q) use ($search) {
                 $q
-                    ->where('no_barcode', 'like', '%' . $search . '%')
-                    ->orwhere('nama', 'like', '%' . $search . '%');
+                    ->where('a.no_barcode', 'like', '%' . $search . '%')
+                    ->orwhere('a.nama', 'like', '%' . $search . '%');
             })
-            ->orderBy('created_at', 'desc')
+            ->orderBy('a.tgl_trx', 'desc')
             ->skip($start)
             ->take($length)
             ->get();
 
-        $count = DB::table('tb_trx_belanja')
-            ->whereBetween('tgl_trx', [$tgl_awal, $tgl_akhir])
+        $count = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b','a.no_barcode','=','b.no_barcode')
+            ->select('a.*','b.id_anggota')
+            ->whereBetween('a.tgl_trx', [$tgl_awal, $tgl_akhir])
             ->where(function ($q) use ($search) {
                 $q
-                    ->where('no_barcode', 'like', '%' . $search . '%')
-                    ->orwhere('nama', 'like', '%' . $search . '%');
+                    ->where('a.no_barcode', 'like', '%' . $search . '%')
+                    ->orwhere('a.nama', 'like', '%' . $search . '%');
             })
             ->count();
 
@@ -187,11 +189,29 @@ class TransaksiController extends Controller
     }
 
     public function edtTransaksi (Request $request){
+
+        $datas = DB::table('tb_anggota')
+            ->select('id_anggota', 'nama', 'chat_id')
+            ->where('id_anggota', $request->et_id_anggota)
+            ->where('status', '=', 'Aktif')
+            ->get();
+
+        $chatId = $datas[0]->chat_id;
+
         if (in_array($request->user()->role, ['Administrator'])) {
         $findid = TransaksiModel::find($request->et_id);
-            $findid->nominal = $request->et_nominal;
 
-            $findid->save();
+                $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+                $nominalAwal = 'Rp ' . number_format($findid->nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+                $nominalAkhir = 'Rp ' . number_format($request->et_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+                Http::post($url, [
+                    'chat_id' => $chatId,
+                    'text' => "Halo, <b>".$datas[0]->nama."</b> ! \nPerubahan data Transaksi dari <b>".$nominalAwal."</b> menjadi <b>".$nominalAkhir."</b> \npada tanggal ".date('d-m-Y H:i:s'). " \n\nMohon maaf atas ketidaknyamanan ini. \nTerima Kasih.",
+                    'parse_mode' => 'HTML' // Gunakan 'HTML' atau 'Markdown'
+                ]); 
+
+        $findid->nominal = $request->et_nominal;
+        $findid->save(); 
 
             return [
                 'message' => 'Edit data Berhasil .',

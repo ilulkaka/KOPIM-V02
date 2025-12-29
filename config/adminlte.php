@@ -331,6 +331,7 @@ return [
             'text' => 'Trx Form',
             'url' => 'transaksi/trx_frm',
             'icon' => 'fas fa-shopping-cart',
+            'can' => 'menu-trx',
         ],
 
         ['header' => 'account_settings'],

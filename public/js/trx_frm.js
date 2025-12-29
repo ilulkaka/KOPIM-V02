@@ -90,6 +90,7 @@ $(document).ready(function () {
     $("#tb_detail_trx").on("click", ".edtTrx", function (e) {
         e.preventDefault();
         var datas = list_detail_trx.row($(this).parents("tr")).data();
+        $("#et_id_anggota").val(datas.id_anggota);
         $("#et_id").val(datas.id_trx_belanja);
         $("#et_tgl").val(datas.tgl_trx);
         $("#et_no").val(datas.no_barcode);
