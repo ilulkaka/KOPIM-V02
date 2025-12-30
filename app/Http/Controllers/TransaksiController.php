@@ -2,18 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Http;
+use App\Models\TransaksiModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use App\Models\AnggotaModel;
-use App\Models\TransaksiModel;
-use Carbon\Carbon;
-use App\Models\User;
-use PHPMailer\PHPMailer\PHPMailer;
 
 class TransaksiController extends Controller
 {
@@ -111,13 +104,13 @@ class TransaksiController extends Controller
                 ]);
             } else {
                 $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-                $formattedNominal = 'Rp ' . number_format($request->trx_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+                $formattedNominal = 'Rp '.number_format($request->trx_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
                 Http::post($url, [
                     'chat_id' => $chatId,
-                    'text' => "Halo, <b>".$datas[0]->nama."</b> ! \nTransaksi anda sebesar <b>".$formattedNominal."</b> \npada tanggal ".date('d-m-Y H:i:s'). " \n\n Terima Kasih.",
-                    'parse_mode' => 'HTML' // Gunakan 'HTML' atau 'Markdown'
-                ]);            
-    
+                    'text' => 'Halo, <b>'.$datas[0]->nama."</b> ! \nTransaksi anda sebesar <b>".$formattedNominal."</b> \npada tanggal ".date('d-m-Y H:i:s')." \n\n Terima Kasih.",
+                    'parse_mode' => 'HTML', // Gunakan 'HTML' atau 'Markdown'
+                ]);
+
                 return response()->json([
                     'message' => 'Transaksi berhasil!',
                     'success' => true,
@@ -132,8 +125,9 @@ class TransaksiController extends Controller
         }
     }
 
-    public function hasilTrxToday (){
-                $tgl_sekarang = date('Y-m-d');
+    public function hasilTrxToday()
+    {
+        $tgl_sekarang = date('Y-m-d');
         $hasil_anggota = DB::select(
             "select sum(nominal)as nominal from tb_trx_belanja where tgl_trx = '$tgl_sekarang' and kategori = 'Anggota'"
         );
@@ -141,6 +135,7 @@ class TransaksiController extends Controller
             "select sum(nominal)as nominal from tb_trx_belanja where tgl_trx = '$tgl_sekarang' and kategori = 'Umum'"
         );
         $hasil_total = $hasil_anggota[0]->nominal + $hasil_umum[0]->nominal;
+
         // dd($hasil_anggota[0]->nominal);
         return [
             'success' => true,
@@ -150,33 +145,34 @@ class TransaksiController extends Controller
         ];
     }
 
-    public function listDetailTrx (Request $request){
+    public function listDetailTrx(Request $request)
+    {
         $draw = $request->input('draw');
         $search = $request->input('search')['value'];
         $start = (int) $request->input('start');
         $length = (int) $request->input('length');
         $tgl_awal = $request->tgl_awal;
         $tgl_akhir = $request->tgl_akhir;
-        $Datas = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b','a.no_barcode','=','b.no_barcode')
-            ->select('a.*','b.id_anggota')
+        $Datas = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b', 'a.no_barcode', '=', 'b.no_barcode')
+            ->select('a.*', 'b.id_anggota')
             ->whereBetween('a.tgl_trx', [$tgl_awal, $tgl_akhir])
             ->where(function ($q) use ($search) {
                 $q
-                    ->where('a.no_barcode', 'like', '%' . $search . '%')
-                    ->orwhere('a.nama', 'like', '%' . $search . '%');
+                    ->where('a.no_barcode', 'like', '%'.$search.'%')
+                    ->orwhere('a.nama', 'like', '%'.$search.'%');
             })
             ->orderBy('a.tgl_trx', 'desc')
             ->skip($start)
             ->take($length)
             ->get();
 
-        $count = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b','a.no_barcode','=','b.no_barcode')
-            ->select('a.*','b.id_anggota')
+        $count = DB::table('tb_trx_belanja as a')->leftJoin('tb_anggota as b', 'a.no_barcode', '=', 'b.no_barcode')
+            ->select('a.*', 'b.id_anggota')
             ->whereBetween('a.tgl_trx', [$tgl_awal, $tgl_akhir])
             ->where(function ($q) use ($search) {
                 $q
-                    ->where('a.no_barcode', 'like', '%' . $search . '%')
-                    ->orwhere('a.nama', 'like', '%' . $search . '%');
+                    ->where('a.no_barcode', 'like', '%'.$search.'%')
+                    ->orwhere('a.nama', 'like', '%'.$search.'%');
             })
             ->count();
 
@@ -188,7 +184,8 @@ class TransaksiController extends Controller
         ];
     }
 
-    public function edtTransaksi (Request $request){
+    public function edtTransaksi(Request $request)
+    {
 
         $datas = DB::table('tb_anggota')
             ->select('id_anggota', 'nama', 'chat_id')
@@ -199,19 +196,19 @@ class TransaksiController extends Controller
         $chatId = $datas[0]->chat_id;
 
         if (in_array($request->user()->role, ['Administrator'])) {
-        $findid = TransaksiModel::find($request->et_id);
+            $findid = TransaksiModel::find($request->et_id);
 
-                $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-                $nominalAwal = 'Rp ' . number_format($findid->nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
-                $nominalAkhir = 'Rp ' . number_format($request->et_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
-                Http::post($url, [
-                    'chat_id' => $chatId,
-                    'text' => "Halo, <b>".$datas[0]->nama."</b> ! \nPerubahan data Transaksi dari <b>".$nominalAwal."</b> menjadi <b>".$nominalAkhir."</b> \npada tanggal ".date('d-m-Y H:i:s'). " \n\nMohon maaf atas ketidaknyamanan ini. \nTerima Kasih.",
-                    'parse_mode' => 'HTML' // Gunakan 'HTML' atau 'Markdown'
-                ]); 
+            $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+            $nominalAwal = 'Rp '.number_format($findid->nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+            $nominalAkhir = 'Rp '.number_format($request->et_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+            Http::post($url, [
+                'chat_id' => $chatId,
+                'text' => 'Halo, <b>'.$datas[0]->nama."</b> ! \nPerubahan data Transaksi dari <b>".$nominalAwal.'</b> menjadi <b>'.$nominalAkhir."</b> \npada tanggal ".date('d-m-Y H:i:s')." \n\nMohon maaf atas ketidaknyamanan ini. \nTerima Kasih.",
+                'parse_mode' => 'HTML', // Gunakan 'HTML' atau 'Markdown'
+            ]);
 
-        $findid->nominal = $request->et_nominal;
-        $findid->save(); 
+            $findid->nominal = $request->et_nominal;
+            $findid->save();
 
             return [
                 'message' => 'Edit data Berhasil .',

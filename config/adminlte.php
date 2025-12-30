@@ -333,6 +333,25 @@ return [
             'icon' => 'fas fa-shopping-cart',
             'can' => 'menu-trx',
         ],
+        ['header' => 'TRANSAKSI B2B'],
+        [
+            'text' => 'Master Item',
+            'url' => 'b2b/master_item',
+            'icon' => 'far fa-file-archive',
+            'can' => 'menu-b2b',
+        ],
+        [
+            'text' => 'Purchase Order',
+            'url' => 'b2b/purchase_order',
+            'icon' => 'far fa-file-archive',
+            'can' => 'menu-b2b',
+        ],
+        [
+            'text' => 'PO Open',
+            'url' => 'b2b/po_open',
+            'icon' => 'far fa-file-archive',
+            'can' => 'menu-b2b',
+        ],
 
         ['header' => 'account_settings'],
         [
@@ -450,9 +469,19 @@ return [
                     'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
                 ],
                 [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => 'https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js',
+                ],
+                [
                     'type' => 'css',
                     'asset' => false,
                     'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => 'https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css',
                 ],
             ],
         ],

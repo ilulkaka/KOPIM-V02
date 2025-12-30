@@ -13,4 +13,19 @@ class PageController extends Controller
     {
         return view('transaksi.trx_frm');
     }
+
+    public function masterItem()
+    {
+        return view('b2b.master_item');
+    }
+
+    public function purchaseOrder()
+    {
+        return view('b2b.purchase_order');
+    }
+
+    public function poOpen()
+    {
+        return view('b2b.po_open');
+    }
 }

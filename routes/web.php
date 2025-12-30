@@ -17,3 +17,9 @@ Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
 
     route::get('transaksi/trx_frm', [PageController::class, 'trxFrm']);
 });
+
+Route::middleware(['web', 'auth', 'can:menu-b2b'])->group(function () {
+    route::get('b2b/master_item', [PageController::class, 'masterItem']);
+    route::get('b2b/purchase_order', [PageController::class, 'purchaseOrder']);
+    route::get('b2b/po_open', [PageController::class, 'poOpen']);
+});
