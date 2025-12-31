@@ -22,4 +22,6 @@ Route::middleware(['web', 'auth', 'can:menu-b2b'])->group(function () {
     route::get('b2b/master_item', [PageController::class, 'masterItem']);
     route::get('b2b/purchase_order', [PageController::class, 'purchaseOrder']);
     route::get('b2b/po_open', [PageController::class, 'poOpen']);
+    route::get('b2b/cetak_sj/{id}', [PageController::class, 'cetakSj']);
+    route::get('b2b/cetak_inv/{id}', [PageController::class, 'cetakInv']);
 });

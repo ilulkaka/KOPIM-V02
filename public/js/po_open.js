@@ -2,25 +2,57 @@ $(document).ready(function () {
     getListPoOpen();
 
     $("#btn_ambilNomor").click(function () {
-        $.ajax({
-            url: APP_BACKEND + "api/b2b/get_no_dokumen",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", "Bearer " + key);
-            },
-            type: "get",
-            dataType: "json",
-        })
-            .done(function (resp) {
-                if (resp.success) {
-                    $("#l_noDok").val(resp.new_dok_nomor);
-                } else {
-                    infoFireAlert(resp.message);
-                }
-            })
-            .fail(function (xhr, status, error) {
-                alert("Terjadi kesalahan saat mengirim data.");
-            });
+        getNomorDokumen();
     });
+
+    var newPlan = {};
+    $("#tb_list_po_open").on(
+        "blur",
+        '.plan-input[contenteditable="true"]',
+        function () {
+            var $this = $(this);
+            var id = $this.data("id"); // Ambil ID
+            var maxQty = parseFloat($this.data("qty")); // Ambil nilai maksimal dari data-qty
+            var newPlanQty = parseFloat($this.text().trim()); // Ambil nilai input
+
+            if (!id) {
+                console.error("ID tidak ditemukan untuk elemen ini.");
+                return;
+            }
+
+            list_po_open
+                .rows()
+                .data()
+                .each(function (row) {
+                    if (!newPlan[row.id_po]) {
+                        newPlan[row.id_po] = {
+                            temp_plan: row.temp_plan || row.qty || 0, // Ambil `temp_plan` atau default `qty`
+                        };
+                    }
+                });
+
+            // Validasi nilai
+            if (isNaN(newPlanQty) || newPlanQty < 0) {
+                infoFireAlert("warning", "Nilai tidak boleh kurang dari 0.");
+                $this.text(0); // Reset ke 0 jika invalid
+                newPlanQty = 0;
+            } else if (newPlanQty > maxQty) {
+                infoFireAlert(
+                    "warning",
+                    "Nilai tidak boleh lebih besar dari qty (" + maxQty + ")."
+                );
+                $this.text(maxQty); // Reset ke nilai maksimal
+                newPlanQty = maxQty;
+            }
+
+            // Perbarui objek `newPlan`
+            if (!newPlan[id]) {
+                newPlan[id] = {};
+            }
+
+            newPlan[id].temp_plan = newPlanQty;
+        }
+    );
 
     // Event listener untuk pemilihan dan pembatalan pemilihan baris
     $("#tb_list_po_open").on("select.dt", function (e, dt, type, indexes) {
@@ -46,6 +78,108 @@ $(document).ready(function () {
             $(".row-select-checkbox:checked").length ===
             list_po_open.rows().count();
         $("#selectAll").prop("checked", allChecked);
+    });
+
+    $("#btn_proKirim").on("click", function () {
+        var noDok = $("#l_noDok").val();
+
+        if (noDok == null || noDok == "") {
+            infoFireAlert("warning", "Ambil Nomor Dokumen terlebih dahulu .");
+        } else {
+            var selectedRows = list_po_open
+                .rows({ selected: true })
+                .data()
+                .toArray();
+
+            var selectedIDs = selectedRows.map(function (row) {
+                // Konversi nilai ke angka
+                var planQty = Number(
+                    newPlan[row.id_po] && newPlan[row.id_po].temp_plan
+                        ? newPlan[row.id_po].temp_plan
+                        : row.temp_plan
+                ); // Gunakan nilai asli jika belum diperbarui
+
+                var qtyOut = Number(row.qty_out); // Konversi ke angka
+
+                var qtyOutTotal = qtyOut + planQty; // Penjumlahan angka
+                var sisa = row.qty - qtyOutTotal;
+
+                return {
+                    id: row.id_po,
+                    plan_qty: planQty,
+                    sisa: sisa,
+                    status: row.status_po,
+                };
+            });
+
+            if (selectedIDs.length === 0) {
+                infoFireAlert("warning", "Record tidak ada yang dipilih.");
+                return;
+            }
+
+            // Periksa apakah semua baris yang dipilih memiliki status "Open"
+            var allStatus = selectedIDs.every(function (row) {
+                return row.status === "Open";
+            });
+
+            if (!allStatus) {
+                infoFireAlert("error", "Status PO Harus Open.");
+                return;
+            }
+
+            $.ajax({
+                url: APP_BACKEND + "api/b2b/upd_kirim_po",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                type: "patch",
+                dataType: "json",
+                data: {
+                    selectedIDs: selectedIDs,
+                    noDokumen: noDok,
+                },
+            })
+                .done(function (resp) {
+                    if (resp.success) {
+                        fireAlert("success", resp.message);
+                        list_po_open.ajax.reload(null, false); // Refresh DataTable
+                        $("#l_noDok").val("");
+                    } else {
+                        infoFireAlert("error", resp.message);
+                    }
+                })
+                .fail(function (xhr, status, error) {
+                    infoFireAlert(
+                        "error",
+                        "Terjadi kesalahan saat mengirim data."
+                    );
+                });
+        }
+    });
+
+    $("#btn_cetak").click(function () {
+        var noDok = $("#l_noDok").val();
+
+        if (!noDok) {
+            getNomorDokumen().then(function (res) {
+                $("#l_noDok").val(res.noDok);
+                alert(res.noDok);
+            });
+        } else {
+            alert(noDok);
+        }
+        alert(noDok);
+        // Membuka kedua tab secara langsung menggunakan variabel
+        var tab1 = window.open(APP_URL + "/b2b/cetak_inv/" + noDok, "_blank");
+        var tab2 = window.open(APP_URL + "/b2b/cetak_sj/" + noDok, "_blank");
+
+        // Pastikan tab tidak null (dibuka)
+        if (!tab1 || !tab2) {
+            infoFireAlert(
+                "error",
+                "Pop-up blocker terdeteksi! Harap izinkan pop-up di browser Anda."
+            );
+        }
     });
 });
 
@@ -234,4 +368,25 @@ function getListPoOpen() {
             ],
         });
     }
+}
+
+function getNomorDokumen() {
+    $.ajax({
+        url: APP_BACKEND + "api/b2b/get_no_dokumen",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + key);
+        },
+        type: "get",
+        dataType: "json",
+    })
+        .done(function (resp) {
+            if (resp.success) {
+                $("#l_noDok").val(resp.new_dok_nomor);
+            } else {
+                infoFireAlert(resp.message);
+            }
+        })
+        .fail(function (xhr, status, error) {
+            alert("Terjadi kesalahan saat mengirim data.");
+        });
 }

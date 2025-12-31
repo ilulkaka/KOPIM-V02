@@ -250,11 +250,11 @@ class B2BController extends Controller
         // Parse nomor terakhir (jika ada) dan increment
         if ($lastDokNomor) {
             // Ambil tahun dari nomor terakhir (asumsi format: 0002122024)
-            $lastYear = substr($lastDokNomor, -4);
+            $lastYear = substr($lastDokNomor,0, 4);
 
             if ($lastYear == $tahun) {
                 // Tahun sama, ambil angka terakhir dan increment
-                $lastNumber = (int)substr($lastDokNomor, 0, 3);
+                $lastNumber = (int)substr($lastDokNomor, -3);
                 $nextNumber = $lastNumber + 1;
             } else {
                 // Tahun berbeda, reset nomor ke 1
@@ -269,7 +269,8 @@ class B2BController extends Controller
         $formattedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
         // Gabungkan menjadi nomor PO baru
-        $newDokNomor = $formattedNumber . $bulan . $tahun;
+        // $newDokNomor = $formattedNumber . $bulan . $tahun;
+        $newDokNomor = $tahun . $bulan . $formattedNumber;
 
         // Return data ke client
         return response()->json([
@@ -277,5 +278,58 @@ class B2BController extends Controller
             'last_dok_nomor' => $lastDokNomor,
             'new_dok_nomor' => $newDokNomor,
         ]);
+    }
+
+    public function updKirimPo (Request $request){
+        dd($request->all()); 
+
+        // Mengambil array selectedIDs yang dikirim melalui AJAX
+        $selectedIDs = $request->input('selectedIDs');
+        $noDokumen = $request->noDokumen;
+        // Cek jika selectedIDs ada dan berisi data
+        if (!$selectedIDs || count($selectedIDs) === 0) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+        }
+
+        // Proses setiap item dalam selectedIDs
+        foreach ($selectedIDs as $item) {
+            $id_po = $item['id'];
+            $plan_qty = $item['plan_qty'];
+            $sisa = $item['sisa'];
+
+            // Ambil data dari tb_po berdasarkan id_po
+            $poData = \DB::table('tb_po')->where('id_po', $id_po)->first();
+
+            // Cek jika data ditemukan
+            if ($poData) {
+                // Insert data ke tb_po_out
+                $ins = POOutModel::create([
+                    'id_po_out' => str::uuid(),
+                    'id_po' => $poData->id_po,
+                    'tgl_po' => $poData->tgl_po,
+                    'nomor_po' => $poData->nomor_po,
+                    'item_cd' => $poData->item_cd,
+                    'nama' => $poData->nama,
+                    'spesifikasi' => $poData->spesifikasi,
+                    'qty_in' => $poData->qty,
+                    'qty_out' => $plan_qty, // Gunakan plan_qty yang diterima
+                    'satuan' => $poData->satuan,
+                    'harga' => $poData->harga,
+                    'total' => $plan_qty * $poData->harga,
+                    'nouki' => $poData->nouki,
+                    'no_dokumen' => $noDokumen,
+                    'tgl_kirim' => date ('Y-m-d'),
+                ]);
+
+                // Jika sisa = 0, update status pada tb_po
+                if ($sisa == 0) {
+                    POModel::where('id_po', $id_po)->update([
+                        'status_po' => 'Closed' // Update status menjadi 'closed' atau sesuai kebutuhan
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil dikirim']);
     }
 }
