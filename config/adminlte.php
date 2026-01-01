@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>K O P I M - v2</b>',
+    'logo' => '<b>K O P I M</b>',
     'logo_img' => 'vendor/adminlte/dist/img/logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
