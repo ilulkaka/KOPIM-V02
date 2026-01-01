@@ -14,6 +14,9 @@ Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
     Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
     route::get('transaksi/trx_frm', [PageController::class, 'trxFrm']);
 });
