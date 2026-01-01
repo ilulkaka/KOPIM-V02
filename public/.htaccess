@@ -5,6 +5,18 @@
         Header always set X-Content-Type-Options "nosniff"
         Header always set Referrer-Policy "strict-origin-when-cross-origin"
         Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+
+        Header always set Content-Security-Policy "
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;
+        style-src 'self' 'unsafe-inline' https:;
+        img-src 'self' data: https:;
+        font-src 'self' data: https:;
+        connect-src 'self' https:;
+        frame-ancestors 'self';
+        base-uri 'self';
+        form-action 'self';
+        "
     </IfModule>
 
     <IfModule mod_negotiation.c>
