@@ -9,7 +9,7 @@ Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-/* DASHBOARD (WAJIB LOGIN) */
+/* DASHBOARD (WAJIB LOGIN)  */
 Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
     Route::get('/', function () {
         return view('dashboard');
