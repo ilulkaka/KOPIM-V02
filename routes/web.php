@@ -11,7 +11,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /* DASHBOARD (WAJIB LOGIN) */
 Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
-    Route::get('/dashboard', function () {
+    Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');
 
