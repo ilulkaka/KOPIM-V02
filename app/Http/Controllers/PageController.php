@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\POOutModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PDF;
 
 class PageController extends Controller
@@ -26,9 +28,10 @@ class PageController extends Controller
         return view('b2b.purchase_order');
     }
 
-    public function poOpen()
+    public function poOpen(Request $request)
     {
-        return view('b2b.po_open');
+        $chat_id = DB::table('tb_anggota')->select('chat_id','nama')->whereNotNull('chat_id')->get();
+        return view('b2b.po_open',['chat_id' => $chat_id]);
     }
 
     public function cetakSj ($noDok){

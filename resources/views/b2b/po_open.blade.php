@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('plugins.Datatables', true)
+@section('plugins.Select2', true)
 {{-- @extends('adminlte::page') --}}
 
 @section('title', 'Delivery List')
@@ -106,20 +107,34 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <button type="button" class="btn btn-primary btn-flat" id="btn_proKirim" name="btn_proKirim"><u
-                                style="color: white">
-                                Proses Kirim</u></button>
-                        {{-- <button type="button" class="btn btn-primary btn-flat" id="btn_updSelected" name="btn_updSelected"><u
-            style="color: white">
-            Movement</u></button>
-    <button type="button" class="btn btn-primary btn-flat" id="btn_penarikan" name="btn_penarikan"><u
-            style="color: white">
-            Penarikan Alat Ukur</u></button>
-    <button class="btn btn-secondary btn-flat" id="btn-print" disabled>Print PDF</button>
-    <button type="button" class="btn btn-success btn-flat" id="btn-excel" disabled>Download
-        Excel</button> --}}
+
+                    <div class="card-footer d-flex align-items-center">
+
+                        <!-- KIRI -->
+                        <button type="button" class="btn btn-primary btn-flat" id="btn_proKirim" name="btn_proKirim">
+                            <u style="color: white">Proses Kirim</u>
+                        </button>
+
+                        <!-- SPACER -->
+                        <div class="ml-auto d-flex align-items-center gap-2">
+                            <select class="form-control select2" name="select_chat_id" id="select_chat_id"
+                                style="width: 200px;">
+                                <option value="">Select Nama...</option>
+                                @foreach ($chat_id as $c)
+                                    <option value="{{ $c->chat_id }}">{{ $c->nama }}</option>
+                                @endforeach
+                            </select>
+
+                            <button type="button" class="btn btn-primary btn-flat" id="btn_send_telegram"
+                                name="btn_send_telegram">
+                                <u style="color: white">Send Telegram</u>
+                            </button>
+                        </div>
+
                     </div>
+
+
+
                 </div>
             </div>
 

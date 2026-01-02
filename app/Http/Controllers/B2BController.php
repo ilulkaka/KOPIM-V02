@@ -7,10 +7,18 @@ use App\Models\POModel;
 use App\Models\POOutModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class B2BController extends Controller
 {
+        private $botToken;
+
+    public function __construct()
+    {
+        $this->botToken = env('TELEGRAM_BOT_TOKEN'); // Ganti dengan token bot Anda
+    }
+
     public function listMasterItem(Request $request)
     {
         $draw = $request->input('draw');
@@ -281,7 +289,7 @@ class B2BController extends Controller
     }
 
     public function updKirimPo (Request $request){
-        dd($request->all()); 
+        // dd($request->all()); 
 
         // Mengambil array selectedIDs yang dikirim melalui AJAX
         $selectedIDs = $request->input('selectedIDs');
@@ -331,5 +339,43 @@ class B2BController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Data berhasil dikirim']);
+    }
+
+    public function krmPoTelegram (Request $request){
+        // dd($request->all());
+            $data = $request->all();
+    // Ambil semua ID
+    $ids = array_column($data['selectedIDs'], 'id');
+
+        // $selectedIDs = $request->input('selectedIDs');
+        $chatId = $request->chatId;
+
+        $datas = DB::table('tb_po')->whereIn('id_po',$ids)->get();
+
+        $pesan = ""; // string kosong untuk menampung semua baris
+
+        if (empty($chatId)) {
+                return response()->json([
+                    'message' => "Transaksi berhasil ! \nChat ID tidak tersedia untuk anggota ini.",
+                    'success' => true,
+                ]);
+            } else {
+                $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+
+                foreach ($datas as $item) {
+    $pesan .= "✅ ".$item->nama . " " . $item->spesifikasi . "  " . $item->qty . " ".$item->satuan."  ".$item->nouki. "\n";
+}
+
+                Http::post($url, [
+    'chat_id' => $chatId,
+    'text' => $pesan,
+    'parse_mode' => 'HTML',
+]);
+
+                return response()->json([
+                    'message' => 'Transaksi berhasil!',
+                    'success' => true,
+                ]);
+            }
     }
 }

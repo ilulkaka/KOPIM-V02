@@ -157,6 +157,69 @@ $(document).ready(function () {
         }
     });
 
+    $("#btn_send_telegram").on("click", function () {
+
+        var chatId = $("#select_chat_id").val();
+            var selectedRows = list_po_open
+                .rows({ selected: true })
+                .data()
+                .toArray();
+
+            var selectedIDs = selectedRows.map(function (row) {
+                return {
+                    id: row.id_po,
+                    status: row.status_po,
+                };
+            });
+
+            if (selectedIDs.length === 0) {
+                infoFireAlert("warning", "Record tidak ada yang dipilih.");
+                return;
+            }
+
+            if (chatId == null || chatId == ""){
+                infoFireAlert("warning", "Pilih Nama.");
+                return;
+            }
+
+            // Periksa apakah semua baris yang dipilih memiliki status "Open"
+            var allStatus = selectedIDs.every(function (row) {
+                return row.status === "Open";
+            });
+
+            if (!allStatus) {
+                infoFireAlert("error", "Status PO Harus Open.");
+                return;
+            }
+
+            $.ajax({
+                url: APP_BACKEND + "api/b2b/krm_po_telegram",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                type: "post",
+                dataType: "json",
+                data: {
+                    selectedIDs: selectedIDs,
+                    chatId: chatId,
+                },
+            })
+                .done(function (resp) {
+                    if (resp.success) {
+                        fireAlert("success", resp.message);
+                        list_po_open.ajax.reload(null, false); // Refresh DataTable
+                    } else {
+                        infoFireAlert("error", resp.message);
+                    }
+                })
+                .fail(function (xhr, status, error) {
+                    infoFireAlert(
+                        "error",
+                        "Terjadi kesalahan saat mengirim data."
+                    );
+                });
+    });
+
     $("#btn_cetak").click(function () {
         var noDok = $("#l_noDok").val();
 
