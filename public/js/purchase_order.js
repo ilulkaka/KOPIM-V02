@@ -87,10 +87,10 @@ $(document).ready(function () {
         })
             .done(function (resp) {
                 if (resp.success) {
-                    $("#tdpo_nopo").focus();
                     fireAlert("success", resp.message);
                     list_add_po.ajax.reload(null, false);
-                    $("#frm_tdpo").trigger("reset");
+                    onSubmit();
+                    $("#tdpo_nopo").focus();
                 } else {
                     infoFireAlert("error", resp.message);
                 }
@@ -190,4 +190,14 @@ function getListAddPo() {
             ],
         });
     }
+}
+
+function onSubmit (){
+    $("#tdpo_itemCd").val("");
+    $("#tdpo_nama").val("");
+    $("#tdpo_spesifikasi").val("");
+    $("#tdpo_qty").val("");
+    $("#tdpo_satuan").val("");
+    $("#tdpo_harga").val("");
+    $("#tdpo_nouki").val("");
 }
