@@ -223,20 +223,24 @@ class B2BController extends Controller
             $asc = 'order by a.nouki desc';
         }
         // dd($tgl);
-        $Datas = DB::select("SELECT a.*, b.qty_out, a.qty - b.qty_out as temp_plan, a.qty * a.harga as total, b.tgl_kirim, c.stock FROM
+        $Datas = DB::select("SELECT a.*, b.qty_out, a.qty - b.qty_out as temp_plan, a.qty * a.harga as total, b.tgl_kirim, c.stock, d.nama as chat_name FROM
         (select * FROM tb_po where status_po = '$statusPO' )a 
         left join
         (select id_po, SUM(qty_out)as qty_out, tgl_kirim FROM tb_po_out group by id_po, tgl_kirim)b on a.id_po = b.id_po
         left join
         (select * from v_stock)c on a.item_cd = c.item_cd
+        left join
+        (select nama, chat_id from tb_anggota)d on a.send_to = d.chat_id
         $tgl and (a.item_cd like '%$search%' or a.nomor_po like '%$search%') $asc LIMIT $length OFFSET $start");
 
-        $co = DB::select("SELECT a.*, b.qty_out, a.qty - b.qty_out as temp_plan, a.qty * a.harga as total, b.tgl_kirim, c.stock FROM
+        $co = DB::select("SELECT a.*, b.qty_out, a.qty - b.qty_out as temp_plan, a.qty * a.harga as total, b.tgl_kirim, c.stock, d.nama as chat_name FROM
         (select * FROM tb_po where status_po = '$statusPO')a 
         left join
         (select id_po, SUM(qty_out)as qty_out, tgl_kirim FROM tb_po_out group by id_po, tgl_kirim)b on a.id_po = b.id_po
         left join
-        (select * from v_stock)c on a.item_cd = c.item_cd $tgl");
+        (select * from v_stock)c on a.item_cd = c.item_cd
+        left join
+        (select nama, chat_id from tb_anggota)d on a.send_to = d.chat_id $tgl");
         $count = count($co);
 
         return [
@@ -344,38 +348,58 @@ class B2BController extends Controller
     public function krmPoTelegram (Request $request){
         // dd($request->all());
             $data = $request->all();
-    // Ambil semua ID
-    $ids = array_column($data['selectedIDs'], 'id');
 
-        // $selectedIDs = $request->input('selectedIDs');
+        // mapping plan_qty berdasarkan id_po
+        $plan_qtys = array_column($data['selectedIDs'], 'plan_qty', 'id');
+
+        // ambil id_po saja untuk query
+        $id_pos = array_keys($plan_qtys);
+
         $chatId = $request->chatId;
 
-        $datas = DB::table('tb_po')->whereIn('id_po',$ids)->get();
+        $datas = DB::table('tb_po')->whereIn('id_po',$id_pos)->get();
 
         $pesan = ""; // string kosong untuk menampung semua baris
 
-        if (empty($chatId)) {
+            if (empty($chatId)) {
                 return response()->json([
                     'message' => "Transaksi berhasil ! \nChat ID tidak tersedia untuk anggota ini.",
                     'success' => true,
                 ]);
             } else {
-                $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+
+                try {
+                    DB::beginTransaction();
+
+                    $updKrmPo = POModel::whereIn('id_po',$id_pos)->update([
+                        'send_to' => $chatId,
+                    ]);
+
+                    $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
 
                 foreach ($datas as $item) {
-    $pesan .= "✅ ".$item->nama . " " . $item->spesifikasi . "  " . $item->qty . " ".$item->satuan."  ".$item->nouki. "\n";
-}
+                    $qty = $plan_qtys[$item->id_po] ?? 0;
+                    $pesan .= "✅ ".$item->nama . " " . $item->spesifikasi . "  " . $qty . " ".$item->satuan."  ".$item->nouki. "\n";
+                };
 
                 Http::post($url, [
-    'chat_id' => $chatId,
-    'text' => $pesan,
-    'parse_mode' => 'HTML',
-]);
+                    'chat_id' => $chatId,
+                    'text' => $pesan,
+                    'parse_mode' => 'HTML',
+                ]);
 
-                return response()->json([
+                    DB::commit();
+
+                                    return response()->json([
                     'message' => 'Transaksi berhasil!',
                     'success' => true,
                 ]);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    DB::rollBack();
+                    return response()->json(["message" => "Transaksi gagal ! \n" . $th->getMessage(), 'success' => false]);
+                }
+                
             }
     }
 }

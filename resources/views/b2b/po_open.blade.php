@@ -52,17 +52,17 @@
                             </div>
 
                             <!-- PEMISAH -->
-                            <div class="col-md-1 d-none d-md-flex justify-content-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
                                 <div class="vertical-divider"></div>
                             </div>
 
                             <!-- Filter -->
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="row g-1">
-                                    <div class="col-8">
+                                    {{-- <div class="col-8">
                                         <input type="date" name="l_tgl" id="l_tgl" class="form-control">
-                                    </div>
-                                    <div class="col-4">
+                                    </div> --}}
+                                    <div class="col-12">
                                         <select name="l_statusPO" id="l_statusPO" class="form-control">
                                             <option value="Open">Open</option>
                                             <option value="Closed">Closed</option>
@@ -101,6 +101,7 @@
                                         <th>Harga</th>
                                         <th>Total</th>
                                         <th>Nouki</th>
+                                        <th>Status Send</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

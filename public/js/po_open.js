@@ -5,6 +5,10 @@ $(document).ready(function () {
         getNomorDokumen();
     });
 
+    $("#btn_reload").click(function () {
+        list_po_open.ajax.reload();
+    });
+
     var newPlan = {};
     $("#tb_list_po_open").on(
         "blur",
@@ -166,9 +170,18 @@ $(document).ready(function () {
                 .toArray();
 
             var selectedIDs = selectedRows.map(function (row) {
+                // Konversi nilai ke angka
+                var planQty = Number(
+                    newPlan[row.id_po] && newPlan[row.id_po].temp_plan
+                        ? newPlan[row.id_po].temp_plan
+                        : row.qty
+                ); // Gunakan nilai asli jika belum diperbarui
+
                 return {
                     id: row.id_po,
+                    plan_qty: planQty,
                     status: row.status_po,
+                    send_to: row.send_to,
                 };
             });
 
@@ -182,13 +195,13 @@ $(document).ready(function () {
                 return;
             }
 
-            // Periksa apakah semua baris yang dipilih memiliki status "Open"
-            var allStatus = selectedIDs.every(function (row) {
-                return row.status === "Open";
+            // Periksa apakah semua baris yang dipilih memiliki status chat "Null"
+            var sudahDikirim = selectedIDs.some(function (row) {
+                return row.send_to !== null && row.send_to !== "";
             });
 
-            if (!allStatus) {
-                infoFireAlert("error", "Status PO Harus Open.");
+            if (sudahDikirim) {
+                infoFireAlert('warning', 'Data sudah pernah dikirim, tidak boleh kirim ulang!');
                 return;
             }
 
@@ -208,6 +221,7 @@ $(document).ready(function () {
                     if (resp.success) {
                         fireAlert("success", resp.message);
                         list_po_open.ajax.reload(null, false); // Refresh DataTable
+                        $("#select_chat_id").val("");
                     } else {
                         infoFireAlert("error", resp.message);
                     }
@@ -285,7 +299,7 @@ function getListPoOpen() {
                     searchable: false,
                 },
                 {
-                    targets: [14],
+                    targets: [15],
                     data: null,
                     //defaultContent: "<button class='btn btn-success'>Complited</button>"
                     render: function (data, type, row, meta) {
@@ -428,9 +442,18 @@ function getListPoOpen() {
                         return ""; // Jika data kosong
                     },
                 },
+                {
+                    data: "chat_name",
+                    name: "chat_name",
+                },
             ],
-        });
-    }
+            createdRow: function(row, data, dataIndex) {
+            if (data.send_to != null && data.send_to != "") {
+                $(row).css('color', 'blue');
+            }
+        }
+    });
+}
 }
 
 function getNomorDokumen() {

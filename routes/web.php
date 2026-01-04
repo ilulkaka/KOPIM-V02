@@ -10,14 +10,16 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /* DASHBOARD (WAJIB LOGIN)  */
-Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+});
 
+Route::middleware(['web', 'auth', 'can:menu-trx'])->group(function () {
     route::get('transaksi/trx_frm', [PageController::class, 'trxFrm']);
 });
 

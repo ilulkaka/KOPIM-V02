@@ -327,13 +327,18 @@ return [
         //     'label' => 4,
         //     'label_color' => 'success',
         // ],
+        ['header' => 'TRANSAKSI',
+            'can' => 'menu-trx'
+        ],
         [
             'text' => 'Trx Form',
             'url' => 'transaksi/trx_frm',
             'icon' => 'fas fa-shopping-cart',
             'can' => 'menu-trx',
         ],
-        ['header' => 'TRANSAKSI B2B'],
+        ['header' => 'TRANSAKSI B2B',
+            'can' => 'menu-b2b'
+        ],
         [
             'text' => 'Master Item',
             'url' => 'b2b/master_item',
@@ -351,6 +356,16 @@ return [
             'url' => 'b2b/po_open',
             'icon' => 'far fa-file-archive',
             'can' => 'menu-b2b',
+        ],
+
+        ['header' => 'ANGGOTA',
+            'can' => 'menu-anggota'
+        ],
+        [
+            'text' => 'List Anggota',
+            'url' => 'anggota/list_anggota',
+            'icon' => 'fas fa-fw fa-user',
+            'can' => 'menu-anggota'
         ],
 
         ['header' => 'account_settings'],
