@@ -363,7 +363,7 @@ return [
         ],
         [
             'text' => 'List Anggota',
-            'url' => 'anggota/list_anggota',
+            'url' => 'anggota/list',
             'icon' => 'fas fa-fw fa-user',
             'can' => 'menu-anggota'
         ],
