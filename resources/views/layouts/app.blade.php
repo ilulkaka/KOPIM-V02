@@ -71,5 +71,7 @@
 {{-- Add common Javascript/Jquery code --}}
 
 @section('js')
-    <script src="{{ asset('js/app.js') }}"></script>
+    {{-- <script src="{{ asset('js/app.js') }}"></script> --}}
+    @vite(['resources/js/app.js'])
+    @stack('scripts')
 @stop
