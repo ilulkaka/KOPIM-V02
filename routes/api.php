@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\B2BController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\AnggotaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -22,4 +23,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('b2b/get_no_dokumen', [B2BController::class, 'getNoDokumen']);
     Route::patch('b2b/upd_kirim_po', [B2BController::class, 'updKirimPo']);
     Route::post('b2b/krm_po_telegram', [B2BController::class, 'krmPoTelegram']);
+
+    Route::get('anggota/list_anggota', [AnggotaController::class, 'listAnggota']);
 });

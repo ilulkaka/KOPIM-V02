@@ -47,4 +47,9 @@ class PageController extends Controller
         $pdf = PDF::loadview('/b2b/pdf_inv',['datas'=>$datas])->setPaper('A4', 'potrait');
         return $pdf->stream('Surat Jalan.pdf');
     }
+
+    public function listAnggota()
+    {
+        return view('anggota.list_anggota');
+    }
 }
