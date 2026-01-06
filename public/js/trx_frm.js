@@ -2,38 +2,40 @@ $(document).ready(function () {
     getLoad();
     hasilTrxToday();
     $("#trx_no_barcode").keypress(function (event) {
-        var no_barcode = $("#trx_no_barcode").val();
-        $("#trx_nominal").val("");
-        if (event.keyCode === 13) {
-            if (no_barcode == null || no_barcode == "") {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            let no_barcode = $(this).val().trim();
+            $("#trx_nominal").val("");
+
+            if (no_barcode === null || no_barcode === "") {
                 infoFireAlert("warning", "Masukkan Nomer Barcode .");
                 return false;
-            } else {
-                $.ajax({
-                    url: APP_BACKEND + "api/trx/get_barcode",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", "Bearer " + key);
-                    },
-                    type: "get",
-                    dataType: "json",
-                    data: {
-                        no_barcode: no_barcode,
-                    },
-                }).done(function (resp) {
-                    if (resp.success) {
-                        $("#trx_nama").val(resp.nama);
-                        $("#trx_nik").val(resp.nik);
-                        $("#trx_nominal").val("");
-                        $("#trx_no_barcode").prop("readonly", true);
-                        $("#trx_nominal").focus();
-                    } else {
-                        $("#trx_nama").val("");
-                        $("#trx_no_barcode").val("");
-                        $("#trx_no_barcode").focus();
-                        infoFireAlert("error", resp.message);
-                    }
-                });
             }
+
+            $.ajax({
+                url: APP_BACKEND + "api/trx/get_barcode",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                type: "get",
+                dataType: "json",
+                data: {
+                    no_barcode: no_barcode,
+                },
+            }).done(function (resp) {
+                if (resp.success) {
+                    $("#trx_nama").val(resp.nama);
+                    $("#trx_nik").val(resp.nik);
+                    $("#trx_nominal").val("");
+                    $("#trx_no_barcode").prop("readonly", true);
+                    $("#trx_nominal").focus();
+                } else {
+                    $("#trx_nama").val("");
+                    $("#trx_no_barcode").val("");
+                    $("#trx_no_barcode").focus();
+                    infoFireAlert("error", resp.message);
+                }
+            });
         }
     });
 
@@ -56,8 +58,22 @@ $(document).ready(function () {
         list_detail_trx.ajax.reload();
     });
 
+    let isSubmitting = false;
     $("#frm_trx").on("submit", function (e) {
         e.preventDefault();
+
+        if (isSubmitting) {
+            return false; // STOP submit ke-2
+        }
+
+        let barcode = $("#trx_no_barcode").val().trim();
+        if (barcode === "") {
+            infoFireAlert("warning", "Barcode tidak boleh kosong");
+            return false;
+        }
+
+        isSubmitting = true; // LOCK
+
         var datas = $(this).serialize();
 
         $.ajax({
@@ -71,14 +87,15 @@ $(document).ready(function () {
         })
             .done(function (resp) {
                 if (resp.success) {
-                    fireAlert("success", resp.message);
-                    hasilTrxToday();
                     getLoad();
+                    hasilTrxToday();
+                    fireAlert("success", resp.message);
                     // $("#modal_penyelenggara").modal("toggle");
                     // list_penyelenggara.ajax.reload(null, false);
                 } else {
                     infoFireAlert("error", resp.message);
                 }
+                isSubmitting = false; // UNLOCK
             })
             .fail(function () {
                 $("#error").html(
@@ -281,9 +298,9 @@ function hasilTrxToday() {
 function getLoad() {
     $("#r_ang").is(":checked");
     $("#trx_no_barcode").prop("readonly", false);
+    $("#trx_no_barcode").val("");
     $("#trx_nama").val("");
     $("#trx_nik").val("");
-    $("#trx_no_barcode").val("");
     $("#trx_kategori").val("Anggota");
     $("#trx_nominal").val("");
     $("#trx_no_barcode").focus();

@@ -66,7 +66,7 @@
 
 @section('css')
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('/assets/img/NPMI_Logo.png') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/style.css') }}"> --}}
 @stop
 {{-- Add common Javascript/Jquery code --}}
 

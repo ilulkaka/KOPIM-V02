@@ -60,6 +60,7 @@ class TransaksiController extends Controller
     public function insTransaksi(Request $request)
     {
         // dd($request->all());
+        $nominal = (int) str_replace(',', '', $request->trx_nominal);
 
         $id_anggota = substr(strrchr($request->trx_no_barcode, '/'), 1);
         $datas = DB::table('tb_anggota')
@@ -88,7 +89,7 @@ class TransaksiController extends Controller
             'id_trx_belanja' => $idTrx,
             'tgl_trx' => $date_trx,
             'nama' => $datas[0]->nama,
-            'nominal' => $request->trx_nominal,
+            'nominal' => $nominal,
             'no_barcode' => $no_barcode,
             'nik' => $datas[0]->nik,
             'kategori' => $kategori,
@@ -104,7 +105,7 @@ class TransaksiController extends Controller
                 ]);
             } else {
                 $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-                $formattedNominal = 'Rp '.number_format($request->trx_nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
+                $formattedNominal = 'Rp '.number_format($nominal, 0, ',', '.');  // Format nominal menjadi Rupiah
                 Http::post($url, [
                     'chat_id' => $chatId,
                     'text' => 'Halo, <b>'.$datas[0]->nama."</b> ! \nTransaksi anda sebesar <b>".$formattedNominal."</b> \npada tanggal ".date('d-m-Y H:i:s')." \n\n Terima Kasih.",
@@ -195,7 +196,7 @@ class TransaksiController extends Controller
 
         $chatId = $datas[0]->chat_id;
 
-        if (in_array($request->user()->role, ['Administrator'])) {
+        if (in_array($request->user()->role_edit, ['Administrator'])) {
             $findid = TransaksiModel::find($request->et_id);
 
             $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";

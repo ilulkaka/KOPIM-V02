@@ -54,7 +54,7 @@
                         <div class="row">
                             <div class="col col-md-12">
                                 <strong><i class="fas fa-qrcode"> No Barcode</i></strong>
-                                <input type="text" id="trx_no_barcode" name="trx_no_barcode"
+                                <input type="password" id="trx_no_barcode" name="trx_no_barcode"
                                     class="form-control rounded-0" placeholder="Masukkan No Barcode ." required>
                             </div>
                         </div>
@@ -90,7 +90,6 @@
                             </div>
 
                         </div>
-                        <p></p>
                     </div>
                 </form>
             </div>
@@ -276,7 +275,7 @@
                                 <strong><i class="fas fa-file-prescription"> Tgl Transaksi</i></strong>
                                 <input type="hidden" name="et_id_anggota" id="et_id_anggota">
                                 <input type="hidden" name="et_id" id="et_id">
-                                <input type="hidden" id="role" name="role" value="{{ Auth::user()->role }}">
+                                <input type="hidden" id="role_edit" name="role_edit" value="{{ Auth::user()->role }}">
                                 <input type="text" id="et_tgl" name="et_tgl" class="form-control rounded-0"
                                     disabled>
                                 <p>
@@ -361,7 +360,7 @@
 
 {{-- Push extra CSS --}}
 @push('css')
-    <link href="{{ asset('css/select2.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/select2.css') }}" rel="stylesheet"> --}}
 @endpush
 
 {{-- Push extra scripts --}}
