@@ -77,29 +77,21 @@
                                     placeholder="Masukkan Nominal..."
                                     style="font-size: 30px; color:blue; font-weight: bold " required>
                             </div>
-                            <div class="col col-md-6">
-                                <br>
-                                <button type="button" class="btn btn-app btn-outline float-right" id="btn_cancel_trx">
-                                    <i class="far fa-window-close"></i> Cancel</button>
-                                <button type="submit" class="btn btn-app btn-success float-right" id="btn_simpan_trx">
-                                    <i class="fas fa-save"></i> Save</button>
-                                {{-- <button type="button" class="btn btn-danger btn-flat float-right"
-                                    id="btn_cancel_trx">Cancel</button> --}}
-                                {{-- <button type="button" class="btn btn-success btn-flat float-right mr-2"
-                                    id="btn_simpan_trx">Simpan</button> --}}
-                            </div>
-
                         </div>
                     </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-secondary btn-flat float-right" id="btn_cancel_trx">
+                            <i class="far fa-window-close"></i> Cancel</button>
+                        <button type="submit" class="btn btn-success btn-flat float-right" id="btn_submit">
+                            <i class="fas fa-save"></i> Save</button>
+                        <button type="button" class="btn btn-outline btn-flat float-left" id="btn_detail_trx"
+                            style="color: blue"><u> Detail
+                                Trx</u></button>
+                        <button type="button" class="btn btn-outline btn-flat float-left" id="btn_download_trx"
+                            style="color: blue"><u>Download
+                                Trx</u></button>
+                    </div>
                 </form>
-            </div>
-            <div class="card-footer">
-                <button type="button" class="btn btn-outline btn-flat float-right" id="btn_detail_trx"
-                    style="color: blue"><u> Detail
-                        Trx</u></button>
-                <button type="button" class="btn btn-outline btn-flat float-right" id="btn_download_trx"
-                    style="color: blue"><u>Download
-                        Trx</u></button>
             </div>
         </div>
 

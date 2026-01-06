@@ -75,7 +75,7 @@ $(document).ready(function () {
         isSubmitting = true; // LOCK
 
         var datas = $(this).serialize();
-
+        $("#btn_submit").prop("disabled", true).text("Processing...");
         $.ajax({
             url: APP_BACKEND + "api/trx/ins_transaksi",
             beforeSend: function (xhr) {
@@ -92,6 +92,7 @@ $(document).ready(function () {
                     fireAlert("success", resp.message);
                     // $("#modal_penyelenggara").modal("toggle");
                     // list_penyelenggara.ajax.reload(null, false);
+                    $("#btn_submit").prop("disabled", false).text("Simpan");
                 } else {
                     infoFireAlert("error", resp.message);
                 }
