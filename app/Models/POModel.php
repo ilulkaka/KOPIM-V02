@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class POModel extends Model
 {
-        protected $table = 'tb_po';
+    protected $table = 'tb_po';
+
     protected $primaryKey = 'id_po';
+
     public $incrementing = false;
+
     protected $fillable = [
         'id_po',
         'tgl_po',

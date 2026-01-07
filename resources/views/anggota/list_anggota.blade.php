@@ -60,13 +60,10 @@
                 <div class="modal-header bg-info">
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fas fa-user-plus"> Tambah
                                 Anggota</i></b> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
-                <div class="modal-body">
-                    <form id="form_ta">
-                        @csrf
+                <form id="frm_ta">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col col-md-6">
                                 <strong><i class="fas fa-file-prescription"> NIK</i></strong>
@@ -103,13 +100,12 @@
                                     placeholder="0811-2453-6789" required>
                             </div>
                         </div>
-                        <p></p>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-flat" id="btn_save_ta">Simpan</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="btn_save_ta">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -122,13 +118,10 @@
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fas fa-user-edit"> Edit Data
                                 Anggota</i></b> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
-                <div class="modal-body">
-                    <form id="form_ea">
-                        @csrf
+                <form id="frm_ea">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col col-md-6">
                                 <strong><i class="fas fa-file-prescription"> NIK</i></strong>
@@ -174,13 +167,12 @@
                                 </select>
                             </div>
                         </div>
-                        <p></p>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-flat" id="btn_save_ea">Simpan</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="btn_save_ea">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -233,7 +225,7 @@
 
 {{-- Push extra CSS --}}
 @push('css')
-    <link href="{{ asset('css/select2.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/select2.css') }}" rel="stylesheet"> --}}
 @endpush
 
 {{-- Push extra scripts --}}

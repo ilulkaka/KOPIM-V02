@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\POOutModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,21 +31,26 @@ class PageController extends Controller
 
     public function poOpen(Request $request)
     {
-        $chat_id = DB::table('tb_anggota')->select('chat_id','nama')->whereNotNull('chat_id')->get();
-        return view('b2b.po_open',['chat_id' => $chat_id]);
+        $chat_id = DB::table('tb_anggota')->select('chat_id', 'nama')->whereNotNull('chat_id')->get();
+
+        return view('b2b.po_open', ['chat_id' => $chat_id]);
     }
 
-    public function cetakSj ($noDok){
-        $datas = POOutModel::where('no_dokumen',$noDok)->get();
+    public function cetakSj($noDok)
+    {
+        $datas = POOutModel::where('no_dokumen', $noDok)->get();
 
-        $pdf = PDF::loadview('/b2b/pdf_sj',['datas'=>$datas])->setPaper('A4', 'potrait');
+        $pdf = PDF::loadview('/b2b/pdf_sj', ['datas' => $datas])->setPaper('A4', 'potrait');
+
         return $pdf->stream('Surat Jalan.pdf');
     }
 
-    public function cetakInv ($noDok){
-        $datas = POOutModel::where('no_dokumen',$noDok)->get();
+    public function cetakInv($noDok)
+    {
+        $datas = POOutModel::where('no_dokumen', $noDok)->get();
 
-        $pdf = PDF::loadview('/b2b/pdf_inv',['datas'=>$datas])->setPaper('A4', 'potrait');
+        $pdf = PDF::loadview('/b2b/pdf_inv', ['datas' => $datas])->setPaper('A4', 'potrait');
+
         return $pdf->stream('Surat Jalan.pdf');
     }
 

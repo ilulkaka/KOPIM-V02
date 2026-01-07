@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class B2BController extends Controller
 {
-        private $botToken;
+    private $botToken;
 
     public function __construct()
     {
@@ -200,7 +200,8 @@ class B2BController extends Controller
         }
     }
 
-    public function listPoOpen (Request $request){
+    public function listPoOpen(Request $request)
+    {
         $draw = $request->input('draw');
         $search = $request->input('search')['value'];
         $start = (int) $request->input('start');
@@ -209,16 +210,16 @@ class B2BController extends Controller
         $statusPO = $request->statusPO;
         $f_tgl = $request->f_tgl;
 
-        if($statusPO == 'Open' && $f_tgl == null){
+        if ($statusPO == 'Open' && $f_tgl == null) {
             $tgl = '';
             $asc = 'order by nouki asc';
-        } else if($statusPO == 'Open' && $f_tgl != null) {
+        } elseif ($statusPO == 'Open' && $f_tgl != null) {
             $tgl = "where a.nouki <='$f_tgl'";
             $asc = 'order by a.nouki asc';
-        } else if($statusPO == 'Closed' && $f_tgl == null){
+        } elseif ($statusPO == 'Closed' && $f_tgl == null) {
             $tgl = '';
             $asc = 'order by a.nouki desc';
-        } else if($statusPO == 'Closed' && $f_tgl != null) {
+        } elseif ($statusPO == 'Closed' && $f_tgl != null) {
             $tgl = "where b.tgl_kirim ='$f_tgl'";
             $asc = 'order by a.nouki desc';
         }
@@ -251,8 +252,9 @@ class B2BController extends Controller
         ];
     }
 
-    public function getNoDokumen (Request $request){
-         // Ambil nomor terakhir dari kolom po_nomor
+    public function getNoDokumen(Request $request)
+    {
+        // Ambil nomor terakhir dari kolom po_nomor
         $lastDokNomor = POOutModel::orderBy('no_dokumen', 'desc')->value('no_dokumen');
 
         // Ambil bulan dan tahun saat ini
@@ -262,11 +264,11 @@ class B2BController extends Controller
         // Parse nomor terakhir (jika ada) dan increment
         if ($lastDokNomor) {
             // Ambil tahun dari nomor terakhir (asumsi format: 0002122024)
-            $lastYear = substr($lastDokNomor,0, 4);
+            $lastYear = substr($lastDokNomor, 0, 4);
 
             if ($lastYear == $tahun) {
                 // Tahun sama, ambil angka terakhir dan increment
-                $lastNumber = (int)substr($lastDokNomor, -3);
+                $lastNumber = (int) substr($lastDokNomor, -3);
                 $nextNumber = $lastNumber + 1;
             } else {
                 // Tahun berbeda, reset nomor ke 1
@@ -282,7 +284,7 @@ class B2BController extends Controller
 
         // Gabungkan menjadi nomor PO baru
         // $newDokNomor = $formattedNumber . $bulan . $tahun;
-        $newDokNomor = $tahun . $bulan . $formattedNumber;
+        $newDokNomor = $tahun.$bulan.$formattedNumber;
 
         // Return data ke client
         return response()->json([
@@ -292,14 +294,15 @@ class B2BController extends Controller
         ]);
     }
 
-    public function updKirimPo (Request $request){
-        // dd($request->all()); 
+    public function updKirimPo(Request $request)
+    {
+        // dd($request->all());
 
         // Mengambil array selectedIDs yang dikirim melalui AJAX
         $selectedIDs = $request->input('selectedIDs');
         $noDokumen = $request->noDokumen;
         // Cek jika selectedIDs ada dan berisi data
-        if (!$selectedIDs || count($selectedIDs) === 0) {
+        if (! $selectedIDs || count($selectedIDs) === 0) {
             return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
         }
 
@@ -330,13 +333,13 @@ class B2BController extends Controller
                     'total' => $plan_qty * $poData->harga,
                     'nouki' => $poData->nouki,
                     'no_dokumen' => $noDokumen,
-                    'tgl_kirim' => date ('Y-m-d'),
+                    'tgl_kirim' => date('Y-m-d'),
                 ]);
 
                 // Jika sisa = 0, update status pada tb_po
                 if ($sisa == 0) {
                     POModel::where('id_po', $id_po)->update([
-                        'status_po' => 'Closed' // Update status menjadi 'closed' atau sesuai kebutuhan
+                        'status_po' => 'Closed', // Update status menjadi 'closed' atau sesuai kebutuhan
                     ]);
                 }
             }
@@ -345,9 +348,10 @@ class B2BController extends Controller
         return response()->json(['success' => true, 'message' => 'Data berhasil dikirim']);
     }
 
-    public function krmPoTelegram (Request $request){
+    public function krmPoTelegram(Request $request)
+    {
         // dd($request->all());
-            $data = $request->all();
+        $data = $request->all();
 
         // mapping plan_qty berdasarkan id_po
         $plan_qtys = array_column($data['selectedIDs'], 'plan_qty', 'id');
@@ -357,30 +361,30 @@ class B2BController extends Controller
 
         $chatId = $request->chatId;
 
-        $datas = DB::table('tb_po')->whereIn('id_po',$id_pos)->get();
+        $datas = DB::table('tb_po')->whereIn('id_po', $id_pos)->get();
 
-        $pesan = ""; // string kosong untuk menampung semua baris
+        $pesan = ''; // string kosong untuk menampung semua baris
 
-            if (empty($chatId)) {
-                return response()->json([
-                    'message' => "Transaksi berhasil ! \nChat ID tidak tersedia untuk anggota ini.",
-                    'success' => true,
+        if (empty($chatId)) {
+            return response()->json([
+                'message' => "Transaksi berhasil ! \nChat ID tidak tersedia untuk anggota ini.",
+                'success' => true,
+            ]);
+        } else {
+
+            try {
+                DB::beginTransaction();
+
+                $updKrmPo = POModel::whereIn('id_po', $id_pos)->update([
+                    'send_to' => $chatId,
                 ]);
-            } else {
 
-                try {
-                    DB::beginTransaction();
-
-                    $updKrmPo = POModel::whereIn('id_po',$id_pos)->update([
-                        'send_to' => $chatId,
-                    ]);
-
-                    $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+                $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
 
                 foreach ($datas as $item) {
                     $qty = $plan_qtys[$item->id_po] ?? 0;
-                    $pesan .= "✅ ".$item->nama . " " . $item->spesifikasi . "  " . $qty . " ".$item->satuan."  ".$item->nouki. "\n";
-                };
+                    $pesan .= '✅ '.$item->nama.' '.$item->spesifikasi.'  '.$qty.' '.$item->satuan.'  '.$item->nouki."\n";
+                }
 
                 Http::post($url, [
                     'chat_id' => $chatId,
@@ -388,18 +392,19 @@ class B2BController extends Controller
                     'parse_mode' => 'HTML',
                 ]);
 
-                    DB::commit();
+                DB::commit();
 
-                                    return response()->json([
+                return response()->json([
                     'message' => 'Transaksi berhasil!',
                     'success' => true,
                 ]);
-                } catch (\Throwable $th) {
-                    //throw $th;
-                    DB::rollBack();
-                    return response()->json(["message" => "Transaksi gagal ! \n" . $th->getMessage(), 'success' => false]);
-                }
-                
+            } catch (\Throwable $th) {
+                // throw $th;
+                DB::rollBack();
+
+                return response()->json(['message' => "Transaksi gagal ! \n".$th->getMessage(), 'success' => false]);
             }
+
+        }
     }
 }

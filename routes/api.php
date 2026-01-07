@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\B2BController;
 use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\AnggotaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -25,4 +25,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('b2b/krm_po_telegram', [B2BController::class, 'krmPoTelegram']);
 
     Route::get('anggota/list_anggota', [AnggotaController::class, 'listAnggota']);
+    Route::post('anggota/add_anggota', [AnggotaController::class, 'addAnggota']);
+    Route::patch('anggota/edt_anggota', [AnggotaController::class, 'edtAnggota']);
 });

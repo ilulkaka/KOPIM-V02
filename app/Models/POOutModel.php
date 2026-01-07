@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class POOutModel extends Model
 {
     protected $table = 'tb_po_out';
+
     protected $primaryKey = 'id_po_out';
+
     public $incrementing = false;
+
     protected $fillable = [
         'id_po_out',
         'id_po',
@@ -25,6 +28,6 @@ class POOutModel extends Model
         'nouki',
         'status_po',
         'no_dokumen',
-        'tgl_kirim'
+        'tgl_kirim',
     ];
 }

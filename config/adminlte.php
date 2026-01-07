@@ -328,7 +328,7 @@ return [
         //     'label_color' => 'success',
         // ],
         ['header' => 'TRANSAKSI',
-            'can' => 'menu-trx'
+            'can' => 'menu-trx',
         ],
         [
             'text' => 'Trx Form',
@@ -337,7 +337,7 @@ return [
             'can' => 'menu-trx',
         ],
         ['header' => 'TRANSAKSI B2B',
-            'can' => 'menu-b2b'
+            'can' => 'menu-b2b',
         ],
         [
             'text' => 'Master Item',
@@ -359,13 +359,13 @@ return [
         ],
 
         ['header' => 'ANGGOTA',
-            'can' => 'menu-anggota'
+            'can' => 'menu-anggota',
         ],
         [
             'text' => 'List Anggota',
             'url' => 'anggota/list',
             'icon' => 'fas fa-fw fa-user',
-            'can' => 'menu-anggota'
+            'can' => 'menu-anggota',
         ],
 
         ['header' => 'account_settings'],

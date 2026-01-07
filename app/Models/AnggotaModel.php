@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AnggotaModel extends Model
 {
     use HasFactory;
+
     protected $table = 'tb_anggota';
+
     protected $primaryKey = 'id_anggota';
+
     public $incrementing = false;
+
     protected $fillable = [
         'id_anggota',
         'nama',
@@ -19,6 +24,6 @@ class AnggotaModel extends Model
         'status',
         'no_ktp',
         'no_barcode',
-        'chat_id'
+        'chat_id',
     ];
 }
