@@ -3,6 +3,7 @@
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\B2BController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -27,4 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('anggota/list_anggota', [AnggotaController::class, 'listAnggota']);
     Route::post('anggota/add_anggota', [AnggotaController::class, 'addAnggota']);
     Route::patch('anggota/edt_anggota', [AnggotaController::class, 'edtAnggota']);
+
+    Route::get('report/list_stock_barang', [ReportController::class, 'listStockBarang']);
+    Route::post('report/add_stock_barang', [ReportController::class, 'addStockBarang']);
 });

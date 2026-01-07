@@ -162,76 +162,75 @@ $(document).ready(function () {
     });
 
     $("#btn_send_telegram").on("click", function () {
-
         var chatId = $("#select_chat_id").val();
-            var selectedRows = list_po_open
-                .rows({ selected: true })
-                .data()
-                .toArray();
+        var selectedRows = list_po_open
+            .rows({ selected: true })
+            .data()
+            .toArray();
 
-            var selectedIDs = selectedRows.map(function (row) {
-                // Konversi nilai ke angka
-                var planQty = Number(
-                    newPlan[row.id_po] && newPlan[row.id_po].temp_plan
-                        ? newPlan[row.id_po].temp_plan
-                        : row.qty
-                ); // Gunakan nilai asli jika belum diperbarui
+        var selectedIDs = selectedRows.map(function (row) {
+            // Konversi nilai ke angka
+            var planQty = Number(
+                newPlan[row.id_po] && newPlan[row.id_po].temp_plan
+                    ? newPlan[row.id_po].temp_plan
+                    : row.qty
+            ); // Gunakan nilai asli jika belum diperbarui
 
-                return {
-                    id: row.id_po,
-                    plan_qty: planQty,
-                    status: row.status_po,
-                    send_to: row.send_to,
-                };
-            });
+            return {
+                id: row.id_po,
+                plan_qty: planQty,
+                status: row.status_po,
+                send_to: row.send_to,
+            };
+        });
 
-            if (selectedIDs.length === 0) {
-                infoFireAlert("warning", "Record tidak ada yang dipilih.");
-                return;
-            }
+        if (selectedIDs.length === 0) {
+            infoFireAlert("warning", "Record tidak ada yang dipilih.");
+            return;
+        }
 
-            if (chatId == null || chatId == ""){
-                infoFireAlert("warning", "Pilih Nama.");
-                return;
-            }
+        if (chatId == null || chatId == "") {
+            infoFireAlert("warning", "Pilih Nama.");
+            return;
+        }
 
-            // Periksa apakah semua baris yang dipilih memiliki status chat "Null"
-            var sudahDikirim = selectedIDs.some(function (row) {
-                return row.send_to !== null && row.send_to !== "";
-            });
+        // Periksa apakah semua baris yang dipilih memiliki status chat "Null"
+        var sudahDikirim = selectedIDs.some(function (row) {
+            return row.send_to !== null && row.send_to !== "";
+        });
 
-            if (sudahDikirim) {
-                infoFireAlert('warning', 'Data sudah pernah dikirim, tidak boleh kirim ulang!');
-                return;
-            }
+        if (sudahDikirim) {
+            infoFireAlert(
+                "warning",
+                "Data sudah pernah dikirim, tidak boleh kirim ulang!"
+            );
+            return;
+        }
 
-            $.ajax({
-                url: APP_BACKEND + "api/b2b/krm_po_telegram",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", "Bearer " + key);
-                },
-                type: "post",
-                dataType: "json",
-                data: {
-                    selectedIDs: selectedIDs,
-                    chatId: chatId,
-                },
+        $.ajax({
+            url: APP_BACKEND + "api/b2b/krm_po_telegram",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + key);
+            },
+            type: "post",
+            dataType: "json",
+            data: {
+                selectedIDs: selectedIDs,
+                chatId: chatId,
+            },
+        })
+            .done(function (resp) {
+                if (resp.success) {
+                    fireAlert("success", resp.message);
+                    list_po_open.ajax.reload(null, false); // Refresh DataTable
+                    $("#select_chat_id").val("");
+                } else {
+                    infoFireAlert("error", resp.message);
+                }
             })
-                .done(function (resp) {
-                    if (resp.success) {
-                        fireAlert("success", resp.message);
-                        list_po_open.ajax.reload(null, false); // Refresh DataTable
-                        $("#select_chat_id").val("");
-                    } else {
-                        infoFireAlert("error", resp.message);
-                    }
-                })
-                .fail(function (xhr, status, error) {
-                    infoFireAlert(
-                        "error",
-                        "Terjadi kesalahan saat mengirim data."
-                    );
-                });
+            .fail(function (xhr, status, error) {
+                infoFireAlert("error", "Terjadi kesalahan saat mengirim data.");
+            });
     });
 
     $("#btn_cetak").click(function () {
@@ -240,12 +239,10 @@ $(document).ready(function () {
         if (!noDok) {
             getNomorDokumen().then(function (res) {
                 $("#l_noDok").val(res.noDok);
-                alert(res.noDok);
             });
         } else {
             alert(noDok);
         }
-        alert(noDok);
         // Membuka kedua tab secara langsung menggunakan variabel
         var tab1 = window.open(APP_URL + "/b2b/cetak_inv/" + noDok, "_blank");
         var tab2 = window.open(APP_URL + "/b2b/cetak_sj/" + noDok, "_blank");
@@ -447,13 +444,13 @@ function getListPoOpen() {
                     name: "chat_name",
                 },
             ],
-            createdRow: function(row, data, dataIndex) {
-            if (data.send_to != null && data.send_to != "") {
-                $(row).css('color', 'blue');
-            }
-        }
-    });
-}
+            createdRow: function (row, data, dataIndex) {
+                if (data.send_to != null && data.send_to != "") {
+                    $(row).css("color", "blue");
+                }
+            },
+        });
+    }
 }
 
 function getNomorDokumen() {

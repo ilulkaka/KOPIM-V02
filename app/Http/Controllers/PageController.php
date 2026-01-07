@@ -58,4 +58,9 @@ class PageController extends Controller
     {
         return view('anggota.list_anggota');
     }
+
+    public function listStockBarang()
+    {
+        return view('report.list_stock_barang');
+    }
 }

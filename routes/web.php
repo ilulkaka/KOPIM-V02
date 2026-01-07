@@ -34,3 +34,7 @@ Route::middleware(['web', 'auth', 'can:menu-b2b'])->group(function () {
 Route::middleware(['web', 'auth', 'can:menu-anggota'])->group(function () {
     route::get('anggota/list', [PageController::class, 'listAnggota']);
 });
+
+Route::middleware(['web', 'auth', 'can:menu-report'])->group(function () {
+    route::get('report/list_stock_barang', [PageController::class, 'listStockBarang']);
+});

@@ -358,6 +358,15 @@ return [
             'can' => 'menu-b2b',
         ],
 
+        ['header' => 'REPORT',
+        ],
+        [
+            'text' => 'Stock Barang',
+            'url' => 'report/list_stock_barang',
+            'icon' => 'fas fa-box-tissue',
+            'can' => 'menu-report',
+        ],
+
         ['header' => 'ANGGOTA',
             'can' => 'menu-anggota',
         ],
