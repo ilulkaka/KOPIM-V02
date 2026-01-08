@@ -177,7 +177,7 @@
             <tr>
                 <td style="width: 15%"><strong>Bank Account</strong></td>
                 <td style="width:5px">:</td>
-                <td>BRI</td>
+                <td>DANAMON</td>
                 <td style="width: 20%; text-align:right; "><strong>OTHER</strong></td>
                 <td>:</td>
                 <td style="text-align: right; border-bottom: 1px solid #000;">0</td>
@@ -185,7 +185,7 @@
             <tr>
                 <td><strong>Account No</strong></td>
                 <td>:</td>
-                <td> 006501074573500</td>
+                <td> 003648864001</td>
                 <td style="width: 20%; text-align:right"><strong>TOTAL</strong></td>
                 <td>:</td>
                 <td style="text-align: right">{{ number_format($subtotal, 0, ',', '.') }}</td>
@@ -193,7 +193,7 @@
             <tr>
                 <td><strong>Account Name</strong></td>
                 <td>:</td>
-                <td>Nur Khalimah</td>
+                <td>Koperasi Konsumen Insan Mandiri Jaya</td>
                 <td></td>
                 <td></td>
                 <td></td>

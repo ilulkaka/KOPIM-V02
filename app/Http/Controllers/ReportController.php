@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Models\InModel;
+use App\Models\OutModel;
 
 class ReportController extends Controller
 {
@@ -68,6 +69,35 @@ class ReportController extends Controller
                 'message' => 'Tambah Stock Berhasil .',
                 'success' => true,
             ];
+        }
+    }
+
+    public function kurangStockBarang(Request $request)
+    {
+        if (! in_array($request->user()->role, ['Administrator', 'Kasir'])) {
+            return [
+                'success' => false,
+                'message' => 'Akses ditolak .',
+            ];
+        } else {
+            if ($request->input('ks_qty') > $request->input('ks_stock')) {
+                return [
+                    'message' => 'Qty out lebih besar dari Stock .',
+                    'success' => false,
+                ];
+            } else {
+                $idout = Str::uuid();
+                $kurang_stock = OutModel::create([
+                    'id_out' => $idout,
+                    'item_cd' => $request->ks_kode,
+                    'tgl_out' => $request->ks_tglklr,
+                    'qty_out' => $request->ks_qty,
+                ]);
+                return [
+                    'message' => 'Kurang Stock Berhasil .',
+                    'success' => true,
+                ];
+            }
         }
     }
 }

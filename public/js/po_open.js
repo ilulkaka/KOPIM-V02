@@ -237,12 +237,13 @@ $(document).ready(function () {
         var noDok = $("#l_noDok").val();
 
         if (!noDok) {
-            getNomorDokumen().then(function (res) {
-                $("#l_noDok").val(res.noDok);
-            });
-        } else {
-            alert(noDok);
+            infoFireAlert(
+                "warning",
+                "Masukkan Nomor Dokumen terlebih dahulu ."
+            );
+            return false;
         }
+
         // Membuka kedua tab secara langsung menggunakan variabel
         var tab1 = window.open(APP_URL + "/b2b/cetak_inv/" + noDok, "_blank");
         var tab2 = window.open(APP_URL + "/b2b/cetak_sj/" + noDok, "_blank");

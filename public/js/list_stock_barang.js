@@ -54,6 +54,35 @@ $(document).ready(function () {
         get_ks();
         $("#modal_kurang_stock").modal("show");
     });
+
+    $("#frm_ks").on("submit", function (e) {
+        e.preventDefault();
+        var datas = $(this).serialize();
+
+        $.ajax({
+            url: APP_BACKEND + "api/report/kurang_stock_barang",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + key);
+            },
+            type: "post",
+            dataType: "json",
+            data: datas,
+        })
+            .done(function (resp) {
+                if (resp.success) {
+                    fireAlert("success", resp.message);
+                    $("#modal_kurang_stock").modal("toggle");
+                    list_stock_barang.ajax.reload(null, false);
+                } else {
+                    infoFireAlert("error", resp.message);
+                }
+            })
+            .fail(function () {
+                $("#error").html(
+                    "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
+                );
+            });
+    });
 });
 
 var list_stock_barang;

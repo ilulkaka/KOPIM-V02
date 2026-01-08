@@ -75,34 +75,53 @@ $(document).ready(function () {
         isSubmitting = true; // LOCK
 
         var datas = $(this).serialize();
+
         $("#btn_submit").prop("disabled", true).text("Processing...");
-        $.ajax({
-            url: APP_BACKEND + "api/trx/ins_transaksi",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", "Bearer " + key);
-            },
-            type: "post",
-            dataType: "json",
-            data: datas,
-        })
-            .done(function (resp) {
-                if (resp.success) {
-                    getLoad();
-                    hasilTrxToday();
-                    fireAlert("success", resp.message);
-                    // $("#modal_penyelenggara").modal("toggle");
-                    // list_penyelenggara.ajax.reload(null, false);
-                    $("#btn_submit").prop("disabled", false).text("Simpan");
-                } else {
-                    infoFireAlert("error", resp.message);
-                }
-                isSubmitting = false; // UNLOCK
-            })
-            .fail(function () {
-                $("#error").html(
-                    "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
-                );
-            });
+
+        Swal.fire({
+            title: "Konfirmasi",
+            text: "Yakin akan menyimpan data transaksi ini?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Simpan",
+            cancelButtonText: "Batal",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // aksi simpan data
+                $.ajax({
+                    url: APP_BACKEND + "api/trx/ins_transaksi",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Authorization", "Bearer " + key);
+                    },
+                    type: "post",
+                    dataType: "json",
+                    data: datas,
+                })
+                    .done(function (resp) {
+                        if (resp.success) {
+                            getLoad();
+                            hasilTrxToday();
+                            fireAlert("success", resp.message);
+                            // $("#modal_penyelenggara").modal("toggle");
+                            // list_penyelenggara.ajax.reload(null, false);
+                            $("#btn_submit")
+                                .prop("disabled", false)
+                                .text("Simpan");
+                        } else {
+                            infoFireAlert("error", resp.message);
+                        }
+                        isSubmitting = false; // UNLOCK
+                    })
+                    .fail(function () {
+                        $("#error").html(
+                            "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
+                        );
+                    });
+            } else {
+                $("#btn_submit").prop("disabled", false).text("Simpan");
+            }
+        });
     });
 
     $("#tb_detail_trx").on("click", ".edtTrx", function (e) {

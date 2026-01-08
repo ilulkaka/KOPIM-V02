@@ -31,4 +31,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('report/list_stock_barang', [ReportController::class, 'listStockBarang']);
     Route::post('report/add_stock_barang', [ReportController::class, 'addStockBarang']);
+    Route::post('report/kurang_stock_barang', [ReportController::class, 'kurangStockBarang']);
 });
