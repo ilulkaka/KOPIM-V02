@@ -62,9 +62,9 @@ $(document).ready(function () {
     $("#frm_trx").on("submit", function (e) {
         e.preventDefault();
 
-        if (isSubmitting) {
-            return false; // STOP submit ke-2
-        }
+        // if (isSubmitting) {
+        //     return false; // STOP submit ke-2
+        // }
 
         let barcode = $("#trx_no_barcode").val().trim();
         if (barcode === "") {
@@ -72,7 +72,7 @@ $(document).ready(function () {
             return false;
         }
 
-        isSubmitting = true; // LOCK
+        // isSubmitting = true; // LOCK
 
         var datas = $(this).serialize();
 
@@ -85,7 +85,7 @@ $(document).ready(function () {
             showCancelButton: true,
             confirmButtonText: "Ya, Simpan",
             cancelButtonText: "Batal",
-            reverseButtons: true,
+            // reverseButtons: true,
         }).then((result) => {
             if (result.isConfirmed) {
                 // aksi simpan data
@@ -118,7 +118,10 @@ $(document).ready(function () {
                             "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
                         );
                     });
-            } else {
+            }
+
+            // ❌ JIKA KLIK BATAL / CLOSE
+            if (result.isDismissed) {
                 $("#btn_submit").prop("disabled", false).text("Simpan");
             }
         });
