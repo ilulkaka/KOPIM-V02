@@ -100,9 +100,9 @@ $(document).ready(function () {
                 })
                     .done(function (resp) {
                         if (resp.success) {
+                            fireAlert("success", resp.message);
                             getLoad();
                             hasilTrxToday();
-                            fireAlert("success", resp.message);
                             // $("#modal_penyelenggara").modal("toggle");
                             // list_penyelenggara.ajax.reload(null, false);
                             $("#btn_submit")
@@ -111,7 +111,7 @@ $(document).ready(function () {
                         } else {
                             infoFireAlert("error", resp.message);
                         }
-                        isSubmitting = false; // UNLOCK
+                        // isSubmitting = false; // UNLOCK
                     })
                     .fail(function () {
                         $("#error").html(

@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    $(".select2").select2({
+        theme: "bootstrap-5",
+    });
+
     getListAnggota();
 
     $("#tb_list_anggota").on("click", ".edtAnggota", function () {

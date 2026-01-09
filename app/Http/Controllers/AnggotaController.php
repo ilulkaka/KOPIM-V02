@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use PDF;
 
 class AnggotaController extends Controller
 {
@@ -119,5 +121,46 @@ class AnggotaController extends Controller
                 'success' => true,
             ];
         }
+    }
+
+    public function printQR(Request $request)
+    {
+        // dd($request->all());
+        $pq_anggota = $request->input('pq_anggota');
+        // dd($pq_anggota[0]);
+        if ($pq_anggota[0] == 'All') {
+            $anggota = DB::table('tb_anggota')
+                ->select('id_anggota', 'no_barcode')
+                ->where('status', '=', 'Aktif')
+                ->get();
+        } else {
+            $anggota = DB::table('tb_anggota')
+                ->select('id_anggota', 'nama', 'no_barcode')
+                ->whereIn('id_anggota', $pq_anggota)
+                ->where('status', '=', 'Aktif')
+                ->get();
+        }
+        // dd($test);
+
+        $id_anggota = [];
+
+        foreach ($anggota as $ang) {
+            array_push($id_anggota, $ang->id_anggota);
+        }
+        // dd($id_anggota);
+        // $qrCode = QrCode::size(75)->generate($id_anggota);
+        $qrCodes = []; // Inisialisasi array kosong untuk menyimpan QR codes
+
+        foreach ($id_anggota as $id) {
+            $qrCode = QrCode::size(75)->generate('kopim.kopbm.com/' . $id);
+            $qrCodes[] = $qrCode;
+        }
+
+        // dd($qrCodes);
+
+        return view('anggota/print_qr', [
+            'anggota' => $anggota,
+            'qrCodes' => $qrCodes,
+        ]);
     }
 }

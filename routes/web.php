@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\AnggotaController;
 use Illuminate\Support\Facades\Route;
 
 /* LOGIN */
@@ -33,6 +34,8 @@ Route::middleware(['web', 'auth', 'can:menu-b2b'])->group(function () {
 
 Route::middleware(['web', 'auth', 'can:menu-anggota'])->group(function () {
     route::get('anggota/list', [PageController::class, 'listAnggota']);
+    // Route::get('anggota/print_qr', [AnggotaController::class, 'printQR']);
+    route::post('anggota/frm_print_qr', [AnggotaController::class, 'printQR']);
 });
 
 Route::middleware(['web', 'auth', 'can:menu-report'])->group(function () {

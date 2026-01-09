@@ -162,7 +162,7 @@ class TransaksiController extends Controller
                     ->where('a.no_barcode', 'like', '%'.$search.'%')
                     ->orwhere('a.nama', 'like', '%'.$search.'%');
             })
-            ->orderBy('a.tgl_trx', 'desc')
+            ->orderBy('a.updated_at', 'desc')
             ->skip($start)
             ->take($length)
             ->get();

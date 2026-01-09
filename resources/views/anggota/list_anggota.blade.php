@@ -184,13 +184,11 @@
             <div class="modal-content">
                 <div class="modal-header bg-info">
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fa fa-qrcode"> Source</i></b> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
-                <div class="modal-body">
-                    <form id="form_pq" method="post" action="{{ url('master/frm_printQR') }}" target="_blank">
-                        @csrf
+                {{-- <form id="frm_pq"> --}}
+                <form id="frm_pq" method="post" action="{{ url('anggota/frm_print_qr') }}" target="_blank">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col-12 col-sm-12">
                                 <div class="col col-md-12">
@@ -198,25 +196,23 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="select2-purple">
-                                        <select class="select2 select2-hidden-accessible" multiple=""
-                                            data-placeholder="Select a Member" data-dropdown-css-class="select2-purple"
-                                            style="width: 100%;" data-select2-id="15" tabindex="-1" aria-hidden="true"
-                                            name="pq_anggota[]" id="pq_anggota[]" required>
-                                            {{-- @foreach ($anggota as $agg)
+                                        <select class="form-control select2" multiple=""
+                                            data-placeholder="Select a Member" style="width: 100%;" tabindex="-1"
+                                            aria-hidden="true" name="pq_anggota[]" id="pq_anggota">
+                                            @foreach ($anggota as $agg)
                                                 <option value="{{ $agg->id_anggota }}">{{ $agg->nama }}</option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <p></p>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-flat" id="btn_save_tp">Print</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="btn_save_tp">Print</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -225,7 +221,7 @@
 
 {{-- Push extra CSS --}}
 @push('css')
-    {{-- <link href="{{ asset('css/select2.css') }}" rel="stylesheet"> --}}
+    <link href="{{ asset('css/select2.css') }}" rel="stylesheet">
 @endpush
 
 {{-- Push extra scripts --}}

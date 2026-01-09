@@ -62,7 +62,11 @@ class PageController extends Controller
 
     public function listAnggota()
     {
-        return view('anggota.list_anggota');
+        $anggota = DB::table('tb_anggota')
+        ->select('id_anggota', 'no_barcode', 'nik', 'nama')->where('status', '=', 'Aktif')
+        ->get();
+
+        return view('anggota.list_anggota', ['anggota' => $anggota]);
     }
 
     public function listStockBarang()
