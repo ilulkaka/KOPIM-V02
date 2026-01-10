@@ -337,7 +337,7 @@ return [
             'can' => 'menu-trx',
         ],
         ['header' => 'TRANSAKSI B2B',
-            'can' => 'menu-b2b',
+            'can' => 'menu-content-b2b',
         ],
         [
             'text' => 'Master Item',
@@ -356,6 +356,12 @@ return [
             'url' => 'b2b/po_open',
             'icon' => 'far fa-file-archive',
             'can' => 'menu-b2b',
+        ],
+        [
+            'text' => 'Invoice & Surat jalan',
+            'url' => 'b2b/inv_sj',
+            'icon' => 'far fa-file-archive',
+            'can' => 'menu-content-b2b',
         ],
 
         ['header' => 'REPORT',

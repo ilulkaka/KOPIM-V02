@@ -73,4 +73,9 @@ class PageController extends Controller
     {
         return view('report.list_stock_barang');
     }
+
+    public function invSj()
+    {
+        return view('b2b.list_inv_sj');
+    }
 }

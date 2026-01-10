@@ -32,6 +32,10 @@ Route::middleware(['web', 'auth', 'can:menu-b2b'])->group(function () {
     route::get('b2b/cetak_inv/{id}', [PageController::class, 'cetakInv']);
 });
 
+Route::middleware(['web', 'auth', 'can:menu-content-b2b'])->group(function () {
+    route::get('b2b/inv_sj', [PageController::class, 'invSj']);
+});
+
 Route::middleware(['web', 'auth', 'can:menu-anggota'])->group(function () {
     route::get('anggota/list', [PageController::class, 'listAnggota']);
     // Route::get('anggota/print_qr', [AnggotaController::class, 'printQR']);
