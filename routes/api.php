@@ -12,6 +12,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('trx/hasil_trx_today', [TransaksiController::class, 'hasilTrxToday']);
     Route::get('trx/list_detail_trx', [TransaksiController::class, 'listDetailTrx']);
     Route::patch('trx/edt_transaksi', [TransaksiController::class, 'edtTransaksi']);
+    Route::get('trx/download_transaksi', [TransaksiController::class, 'downloadTransaksi']);
+    Route::get('trx/send_mail', [TransaksiController::class, 'sendMail']);
 
     Route::get('b2b/list_master_item', [B2BController::class, 'listMasterItem']);
     Route::post('b2b/add_master_item', [B2BController::class, 'addMasterItem']);

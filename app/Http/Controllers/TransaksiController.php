@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class TransaksiController extends Controller
 {
@@ -187,7 +192,7 @@ class TransaksiController extends Controller
 
     public function edtTransaksi(Request $request)
     {
-
+// dd($request->all());
         $datas = DB::table('tb_anggota')
             ->select('id_anggota', 'nama', 'chat_id')
             ->where('id_anggota', $request->et_id_anggota)
@@ -196,7 +201,7 @@ class TransaksiController extends Controller
 
         $chatId = $datas[0]->chat_id;
 
-        if (in_array($request->user()->role_edit, ['Administrator'])) {
+        if (in_array($request->user()->role, ['Administrator','Pengurus'])) {
             $findid = TransaksiModel::find($request->et_id);
 
             $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
@@ -218,6 +223,159 @@ class TransaksiController extends Controller
         } else {
             return [
                 'message' => 'Edit gagal, Access Denied .',
+                'success' => false,
+            ];
+        }
+    }
+
+    public function downloadTransaksi(Request $request)
+    {
+        // dd($request->all());
+        $tgl_awal = Carbon::createFromFormat(
+            'Y-m-d',
+            $request->tgl_awal
+        )->format('d-m-Y');
+        $tgl_akhir = Carbon::createFromFormat(
+            'Y-m-d',
+            $request->tgl_akhir
+        )->format('d-m-Y');
+
+        $Datas = DB::select(
+            "select no_barcode, nik, nama, sum(nominal)as nominal, kategori from tb_trx_belanja where tgl_trx between '$request->tgl_awal' and '$request->tgl_akhir' group by no_barcode, nik, nama, kategori order by nik "
+        );
+
+        if (count($Datas) > 0) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:F1');
+            $sheet->setCellValue(
+                'A1',
+                'Transaksi dari Tanggal ' . $tgl_awal . ' Sampai ' . $tgl_akhir
+            );
+            $sheet->setCellValue('A2', 'No');
+            $sheet->setCellValue('B2', 'No Barcode');
+            $sheet->setCellValue('C2', 'NIK');
+            $sheet->setCellValue('D2', 'NAMA');
+            $sheet->setCellValue('E2', 'Nominal');
+            $sheet->setCellValue('F2', 'Kategori');
+
+            $line = 3;
+            $no = 1;
+            foreach ($Datas as $data) {
+                $sheet->setCellValue('A' . $line, $no++);
+                $sheet->setCellValue('B' . $line, $data->no_barcode);
+                $sheet->setCellValue('C' . $line, $data->nik);
+                $sheet->setCellValue('D' . $line, $data->nama);
+                $sheet->setCellValue('E' . $line, $data->nominal);
+                $sheet->setCellValue('F' . $line, $data->kategori);
+
+                $line++;
+            }
+
+            // ========= Online ========================================
+            // $writer = new Xlsx($spreadsheet);
+            // $filename = 'Transaksi_' . date('YmdHis') . '.xlsx';
+            // //dd('/home/berkahma/public_html/storage/excel/' . $filename);
+
+            // $writer->save(
+            //     '/home/berkahma/public_html/storage/excel/' . $filename
+            // );
+            // return ['file' => url('/') . '/storage/excel/' . $filename];
+
+            // ========= Offline ========================================
+            $writer = new Xlsx($spreadsheet);
+            $filename = 'Transaksi.xlsx';
+            $writer->save(public_path('storage/excel/' . $filename));
+            return ['file' => url('/') . '/storage/excel/' . $filename];
+        } else {
+            return ['message' => 'No Data .', 'success' => false];
+        }
+    }
+
+    public function sendMail(Request $request)
+    {
+        // dd($request->all());
+
+        require base_path('vendor/autoload.php');
+        $mail = new PHPMailer(true); // Passing `true` enables exceptions
+
+        $m_tgl_awal = Carbon::createFromFormat(
+            'Y-m-d',
+            $request->m_tgl_awal
+        )->format('d-m-Y');
+        $m_tgl_akhir = Carbon::createFromFormat(
+            'Y-m-d',
+            $request->m_tgl_akhir
+        )->format('d-m-Y');
+
+        $user_mail = 'cs.kopim@kopbm.com';
+        $user_pass = 'Cskopim12%';
+
+        $mailSendTo = $request->sm_to;
+        $mailSendToCC = $request->sm_cc;
+        // data pengaju cuti
+        // $datasCuti = CutiModel::where('id_cuti', $idCuti)->get();
+        // $filename =
+        //     $datasCuti[0]->nomer_report . '_' . $datasCuti[0]->nama . '.pdf';
+
+        try {
+            // Konfigurasi SMTP
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = 'html';
+
+            $mail->isSMTP();
+            $mail->Host = 'smtp.hostinger.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = $user_mail;
+            $mail->Password = $user_pass;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->Timeout = 30;
+
+            // $mail->isSMTP();
+            // $mail->Host = 'smtp.hostinger.com';
+            // $mail->SMTPAuth = true;
+            // $mail->Username = $user_mail;
+            // $mail->Password = $user_pass;
+            // $mail->SMTPSecure = 'tls';
+            // $mail->Port = 587;
+
+            // Set pengirim dan penerima
+            $mail->setFrom($user_mail, 'CS KOPIM');
+            $mail->addAddress($mailSendTo, $mailSendTo);
+
+            $mail->addCC($mailSendToCC);
+            //$mail->addBCC($request->emailBcc);
+            $mail->AddAttachment(public_path('storage/excel/Transaksi.xlsx'));
+
+            // Konten email
+            $mail->isHTML(true);
+            $mail->Subject = 'Rekap Transaksi Kopim';
+            $mail->Body =
+                'Untuk bagian pemotongan .
+            <br>
+            <br>
+            Terlampir adalah rekap transaksi untuk periode <br><b>' .
+                $m_tgl_awal .
+                '</b> Sampai <b>' .
+                $m_tgl_akhir .
+                '</b> 
+            <br>
+            <br>
+            Terima Kasih <br>
+            KOPIM';
+
+            // Kirim email
+            $mail->send();
+
+            return [
+                'message' => 'Email berhasil dikirim.',
+                'success' => true,
+            ];
+        } catch (Exception $e) {
+            return "Email gagal dikirim: {$mail->ErrorInfo}";
+            return [
+                'message' => "Email gagal dikirim: {$mail->ErrorInfo}",
                 'success' => false,
             ];
         }

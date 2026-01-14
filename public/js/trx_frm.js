@@ -54,6 +54,10 @@ $(document).ready(function () {
         getListDetailTrx();
     });
 
+    $("#btn_download_trx").click(function () {
+        $("#modal_download_trx").modal("show");
+    });
+
     $("#btn_reload").on("click", function () {
         list_detail_trx.ajax.reload();
     });
@@ -167,6 +171,70 @@ $(document).ready(function () {
                     "<div class='alert alert-danger'><div>Tidak dapat terhubung ke server !!!</div></div>"
                 );
             });
+    });
+
+    $("#btn_download").on("click", function () {
+        var format = $("#dot_format").val();
+        var tgl_awal = $("#tgl_awal1").val();
+        var tgl_akhir = $("#tgl_akhir1").val();
+
+        if (format == "" || tgl_awal == "" || tgl_akhir == "") {
+            infoFireAlert("warning", "Kolom Harus terisi semua .");
+        } else if (format == "Pdf") {
+            infoFireAlert("warning", "Format PDF Belum tersedia .");
+        } else {
+            $.ajax({
+                url: APP_BACKEND + "api/trx/download_transaksi",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                type: "get",
+                dataType: "json",
+                data: {
+                    format: format,
+                    tgl_awal: tgl_awal,
+                    tgl_akhir: tgl_akhir,
+                },
+                success: function (response) {
+                    if (response.file) {
+                        var fpath = response.file;
+                        window.open(fpath, "_blank");
+                        $("#modal_download_trx").modal("hide");
+
+                        $("#modal_sending_mail").modal("show");
+                        var m_tgl_awal = $("#m_tgl_awal").val(tgl_awal);
+                        var m_tgl_akhir = $("#m_tgl_akhir").val(tgl_akhir);
+                        //location.reload();
+                    } else {
+                        infoFireAlert("warning", response.message);
+                    }
+                },
+            });
+        }
+    });
+
+    $("#frm_sm").on("submit", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+        $.ajax({
+            url: APP_BACKEND + "api/trx/send_mail",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + key);
+            },
+            type: "get",
+            dataType: "json",
+            data: data,
+        }).done(function (resp) {
+            if (resp.success) {
+                alert(resp.message);
+                location.reload();
+                //$('#modal_sending_mail').modal('toggle');
+                // list_detail_trx.ajax.reload(null, false);
+            } else {
+                alert(resp.message);
+            }
+        });
     });
 });
 

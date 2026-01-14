@@ -201,9 +201,6 @@
                 <div class="modal-header bg-secondary">
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fas fa-cart"> Download
                                 Transaksi</i></b> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -230,19 +227,15 @@
                                 required>
                         </div>
                     </div>
-                    <hr>
-                    <div class="col-md-12">
-                        <div class="row">
-
-                            <button type="button" id="btn_preview" name="btn_preview"
-                                class="form-control col-md-4 rounded-pill">Preview</button>
-                            <button type="button" id="btn_download" name="btn_download"
-                                class="form-control col-md-4 rounded-pill"> Download </button>
-                            <button type="button" data-dismiss="modal" class="form-control col-md-4 rounded-pill">
-                                Close
-                            </button>
-                        </div>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn_preview" name="btn_preview"
+                        class="form-control col-md-3 rounded-pill">Preview</button>
+                    <button type="button" id="btn_download" name="btn_download"
+                        class="form-control col-md-3 rounded-pill"> Download </button>
+                    <button type="button" data-dismiss="modal" class="form-control col-md-3 rounded-pill">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -308,13 +301,10 @@
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fa fa-qrcode"> Sending
                                 Mail</i></b>
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
-                <div class="modal-body">
-                    <form id="form_sm">
-                        @csrf
+                <form id="frm_sm">
+                    @csrf
+                    <div class="modal-body">
                         <input type="hidden" id="m_tgl_awal" name="m_tgl_awal" class="form-control rounded-0">
                         <input type="hidden" id="m_tgl_akhir" name="m_tgl_akhir" class="form-control rounded-0">
                         <div class="row">
@@ -338,13 +328,12 @@
                                 </div>
                             </div>
                         </div>
-                        <p></p>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-flat" id="btn_send">Send</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="btn_send">Send</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
