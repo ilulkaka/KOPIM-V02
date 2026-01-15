@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Illuminate\Support\Facades\Storage;
 
 class TransaksiController extends Controller
 {
@@ -283,10 +284,23 @@ class TransaksiController extends Controller
             // return ['file' => url('/') . '/storage/excel/' . $filename];
 
             // ========= Offline ========================================
-            $writer = new Xlsx($spreadsheet);
-            $filename = 'Transaksi.xlsx';
-            $writer->save(public_path('storage/excel/' . $filename));
-            return ['file' => url('/') . '/storage/excel/' . $filename];
+            // $writer = new Xlsx($spreadsheet);
+            // $filename = 'Transaksi.xlsx';
+            // $writer->save(public_path('storage/excel/' . $filename));
+            // return ['file' => url('/') . '/storage/excel/' . $filename];
+
+                $filename = 'Transaksi.xlsx';
+    $path = storage_path('app/public/excel/' . $filename);
+
+    if (!file_exists($path)) {
+        return response()->json(['message' => 'File tidak ditemukan'], 404);
+    }
+
+    return response()->download(
+        $path,
+        $filename,
+        ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+    );
         } else {
             return ['message' => 'No Data .', 'success' => false];
         }
