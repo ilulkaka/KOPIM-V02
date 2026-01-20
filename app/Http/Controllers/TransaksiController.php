@@ -289,18 +289,20 @@ class TransaksiController extends Controller
             // $writer->save(public_path('storage/excel/' . $filename));
             // return ['file' => url('/') . '/storage/excel/' . $filename];
 
-                $filename = 'Transaksi.xlsx';
-    $path = storage_path('app/public/excel/' . $filename);
+            $filename = 'Transaksi.xlsx';
+            $path = 'excel/' . $filename;
 
-    if (!file_exists($path)) {
-        return response()->json(['message' => 'File tidak ditemukan'], 404);
-    }
+            if (!Storage::disk('public')->exists($path)) {
+                return response()->json(['message' => 'File tidak ditemukan'], 404);
+            }
 
-    return response()->download(
-        $path,
-        $filename,
-        ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-    );
+            return Storage::disk('public')->download(
+                $path,
+                $filename,
+                [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ]
+            );
         } else {
             return ['message' => 'No Data .', 'success' => false];
         }
