@@ -202,43 +202,43 @@
                     <h5 class="modal-title" id="exampleModalLongTitle"><b><i class="fas fa-cart"> Download
                                 Transaksi</i></b> </h5>
                 </div>
-                <form>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col col-md-4">
-                                <strong><i class="fas fa-caret-square-down"> Format</i></strong>
-                                <select id="dot_format" name="dot_format" class="form-control rounded-0" required>
-                                    <option value="">Kategori ...</option>
-                                    <option value="Excel">Excel</option>
-                                    <option value="Pdf">Pdf</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col col-md-6">
-                                <strong><i class="fas fa-date"> Beginning</i></strong>
-                                <input type="date" id="tgl_awal1" name="tgl_awal1" class="form-control rounded-0"
-                                    required>
-                            </div>
-
-                            <div class="col col-md-6">
-                                <strong><i class="fas fa-date"> Ending</i></strong>
-                                <input type="date" id="tgl_akhir1" name="tgl_akhir1" class="form-control rounded-0"
-                                    required>
-                            </div>
+                {{-- <form> --}}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <strong><i class="fas fa-caret-square-down"> Format</i></strong>
+                            <select id="dot_format" name="dot_format" class="form-control rounded-0" required>
+                                <option value="">Kategori ...</option>
+                                <option value="Excel">Excel</option>
+                                <option value="Pdf">Pdf</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" id="btn_preview" name="btn_preview"
-                            class="form-control col-md-3 rounded-pill">Preview</button>
-                        <button type="submit" id="btn_download" name="btn_download"
-                            class="form-control col-md-3 rounded-pill"> Download </button>
-                        <button type="button" data-dismiss="modal" class="form-control col-md-3 rounded-pill">
-                            Close
-                        </button>
+
+                    <div class="row">
+                        <div class="col col-md-6">
+                            <strong><i class="fas fa-date"> Beginning</i></strong>
+                            <input type="date" id="tgl_awal1" name="tgl_awal1" class="form-control rounded-0"
+                                required>
+                        </div>
+
+                        <div class="col col-md-6">
+                            <strong><i class="fas fa-date"> Ending</i></strong>
+                            <input type="date" id="tgl_akhir1" name="tgl_akhir1" class="form-control rounded-0"
+                                required>
+                        </div>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn_preview" name="btn_preview"
+                        class="form-control col-md-3 rounded-pill">Preview</button>
+                    <button type="submit" id="btn_download" name="btn_download"
+                        class="form-control col-md-3 rounded-pill"> Download </button>
+                    <button type="button" data-dismiss="modal" class="form-control col-md-3 rounded-pill">
+                        Close
+                    </button>
+                </div>
+                {{-- </form> --}}
             </div>
         </div>
     </div>

@@ -173,7 +173,8 @@ $(document).ready(function () {
             });
     });
 
-    $("#btn_download").on("click", function () {
+    $("#btn_download").on("click", function (e) {
+        e.preventDefault();
         var format = $("#dot_format").val();
         var tgl_awal = $("#tgl_awal1").val();
         var tgl_akhir = $("#tgl_akhir1").val();
@@ -183,78 +184,31 @@ $(document).ready(function () {
         } else if (format == "Pdf") {
             infoFireAlert("warning", "Format PDF Belum tersedia .");
         } else {
-            // $.ajax({
-            //     url: APP_BACKEND + "api/trx/download_transaksi",
-            //     beforeSend: function (xhr) {
-            //         xhr.setRequestHeader("Authorization", "Bearer " + key);
-            //     },
-            //     type: "get",
-            //     dataType: "json",
-            //     data: {
-            //         format: format,
-            //         tgl_awal: tgl_awal,
-            //         tgl_akhir: tgl_akhir,
-            //     },
-            //     success: function (response) {
-            //         if (response.file) {
-            //             var fpath = response.file;
-            //             window.open(fpath, "_blank");
-            //             $("#modal_download_trx").modal("hide");
-
-            //             $("#modal_sending_mail").modal("show");
-            //             var m_tgl_awal = $("#m_tgl_awal").val(tgl_awal);
-            //             var m_tgl_akhir = $("#m_tgl_akhir").val(tgl_akhir);
-            //             //location.reload();
-            //         } else {
-            //             infoFireAlert("warning", response.message);
-            //         }
-            //     },
-            // });
-
             $.ajax({
                 url: APP_BACKEND + "api/trx/download_transaksi",
-                method: "GET",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + key);
+                },
+                type: "get",
+                dataType: "json",
                 data: {
                     format: format,
                     tgl_awal: tgl_awal,
                     tgl_akhir: tgl_akhir,
                 },
-                xhrFields: {
-                    responseType: "blob", // 🔴 INI KUNCINYA
-                },
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", "Bearer " + key);
-                },
-                success: function (blob, status, xhr) {
-                    // ambil nama file dari header (jika ada)
-                    let filename = "Transaksi.xlsx";
-                    let disposition = xhr.getResponseHeader(
-                        "Content-Disposition"
-                    );
-                    if (
-                        disposition &&
-                        disposition.indexOf("filename=") !== -1
-                    ) {
-                        filename = disposition
-                            .split("filename=")[1]
-                            .replace(/"/g, "");
+                success: function (response) {
+                    if (response.file) {
+                        var fpath = response.file;
+                        window.open(fpath, "_blank");
+                        $("#modal_download_trx").modal("hide");
+
+                        $("#modal_sending_mail").modal("show");
+                        var m_tgl_awal = $("#m_tgl_awal").val(tgl_awal);
+                        var m_tgl_akhir = $("#m_tgl_akhir").val(tgl_akhir);
+                        //location.reload();
+                    } else {
+                        infoFireAlert("warning", response.message);
                     }
-
-                    // trigger download
-                    let url = window.URL.createObjectURL(blob);
-                    let a = document.createElement("a");
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-
-                    $("#modal_download_trx").modal("hide");
-                    $("#modal_sending_mail").modal("show");
-                },
-                error: function () {
-                    infoFireAlert("error", "Gagal download file");
                 },
             });
         }
