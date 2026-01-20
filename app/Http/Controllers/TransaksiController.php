@@ -292,9 +292,15 @@ class TransaksiController extends Controller
             $filename = 'Transaksi.xlsx';
             $path = storage_path('app/public/excel/' . $filename);
 
-            if (!file_exists($path)) {
-                abort(404, 'File tidak ditemukan');
+            // 2️⃣ Hapus file lama (jika ada)
+            if (File::exists($path)) {
+                File::delete($path);
             }
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save(
+                storage_path('app/public/excel/Transaksi.xlsx')
+            );
 
             return response()->streamDownload(function () use ($path) {
                 readfile($path);
