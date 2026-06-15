@@ -10,6 +10,10 @@ Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+route::get('/privacy', function () {
+    return view('privacy');
+});
+
 /* DASHBOARD (WAJIB LOGIN) */
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/', function () {
